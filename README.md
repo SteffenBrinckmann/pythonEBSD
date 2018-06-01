@@ -8,5 +8,12 @@ Features:
   - verified with the OIM software and mTex
   - heavily tested for cubic
 
+EBSD-Inverse Pole Figure (IPF) of polycrystalline Copper
+![EBSD of polycrystalline Copper](HTMLInput/ebsd_py_ND.png)
+
+corresponding pole-figure
+![Pole figure](HTMLInput/ebsd_py_PF100.png)
+
+
 Future features
   - improve cleaning, grain identification methods
