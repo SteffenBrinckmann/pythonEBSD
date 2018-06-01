@@ -38,7 +38,8 @@ corresponding pole-figure
  - help with cleaning and grain identification
 
 
-# Build docummentation
+# Build docummentation and tutorials
 ```bash
 python verifyAll.py
 ```
+then open HTML/index.html in webbrowser
