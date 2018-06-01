@@ -1,1 +1,22 @@
-/home/s.brinckmann/MPIE/rSourceCode/Nanotribology/ebsd_Symmetry.doctest
+/** \file
+\brief Tutorials for ebsd_Symmetry
+
+\section overview_sec Overview
+Symmetry class (e.g. cubic)
+
+Note: "doctest: +SKIP" implies that the automatic test skips it
+
+\section tutorials Tutorials
+
+\subsection example1 Example: IPF map
+\verbatim
+>>> from ebsd_Symmetry import Symmetry
+>>> s = Symmetry('cubic')
+>>> s.standardTriangle()                               # doctest: +SKIP
+
+\endverbatim
+
+
+\section ebsd_Symmetry_code Python source code documentation
+\ref ebsd_Symmetry.Symmetry material symmetry
+*/
