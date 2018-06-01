@@ -9,6 +9,8 @@ Features:
   - verified with the OIM software and mTex
   - heavily tested for cubic
   - some educational plotting
+  - examples and lots of docummentation via Doxygen
+  - doctest verifies functionality
 
 
 EBSD-Inverse Pole Figure (IPF) of polycrystalline Copper
@@ -26,3 +28,7 @@ What features I do not envision:
 Future features
   - introduce Kernel average misorientation
   - improve cleaning, grain identification methods
+
+
+Build docummentation
+  >>python verifyAll.py
