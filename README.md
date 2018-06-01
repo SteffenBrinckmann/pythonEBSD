@@ -5,7 +5,8 @@ I look for more contributors, see below
 # Features:
   - File formats accepted .ang | .osc | .crc | .txt
   - can write .ang for FCC. Others could be added
-  - fast plotting interaction using virtual mask (only used for plotting);
+  - fast plotting interaction using virtual mask (only used for plotting)
+    - increases speed in intermediate test plots
     - even though some interpolation and reading takes time
     - can be removed just before final plotting
   - verified with the OIM software and mTex
@@ -38,7 +39,13 @@ corresponding pole-figure
  - help with cleaning and grain identification
 
 
-# Build docummentation and tutorials
+# Get and build docummentation
+Clone data from github
+```bash
+git clone https://github.com/SteffenBrinckmann/pythonEBSD.git
+```
+
+Build documentation and tutorials
 ```bash
 python verifyAll.py
 ```
