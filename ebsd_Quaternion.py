@@ -358,7 +358,8 @@ class Quaternion:
     def asEulers(self,
                  notation = 'bunge',
                  degrees = False,
-                 standardRange = False):
+                 standardRange = False,
+                 round=8):
       '''
       conversion of ACTIVE rotation to Euler angles taken from.
 
@@ -397,7 +398,7 @@ class Quaternion:
             angles[1] += math.pi
             angles[2] *= -1.0
           angles[2] %= 2*math.pi
-        return np.degrees(angles) if degrees else angles
+        return np.round(np.degrees(angles),round) if degrees else angles
       else:  						#vector version
 	angles = np.zeros( (3,len(self.w) ))
 	mask1 = np.logical_and( np.abs(self.x)<1e-4, np.abs(self.y)<1e-4 )
@@ -427,7 +428,7 @@ class Quaternion:
           angles[1,mask_] += math.pi
           angles[2,mask_] *= -1.0
           angles[2,:] %= 2*math.pi
-        return np.degrees(angles) if degrees else angles
+        return np.round(np.degrees(angles),round) if degrees else angles
 
 
 

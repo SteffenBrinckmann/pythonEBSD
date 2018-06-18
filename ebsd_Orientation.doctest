@@ -8,8 +8,8 @@ Note: "doctest: +SKIP" implies that the automatic test skips it
 
 \section tutorials Tutorials
 
-\subsection example1 Example: check colors of certain orientations. Answers are given in RGB scale.
-Three examples are investigated:  
+\subsection exampleColors Example: check colors of certain orientations. Answers are given in RGB scale.
+Three examples are investigated:
 - [100] = red: 1,0,0
 - [110] = green: 0,1,0  (rotation by 45deg arount Phi)
 - [111] = blue: 0,0,1
@@ -17,22 +17,22 @@ Each example creates an angle from 3 float values, creates an orientation and ro
 \verbatim
 >>> import numpy as np
 >>> from ebsd_Orientation import Orientation
->>> angle = np.radians([0,0,0])                       
->>> o = Orientation(Eulers=angle, symmetry="cubic")   
->>> np.round(o.IPFcolor( [0,0,1] ),3) 
+>>> angle = np.radians([0,0,0])
+>>> o = Orientation(Eulers=angle, symmetry="cubic")
+>>> np.round(o.IPFcolor( [0,0,1] ),3)
 array([ 1.,  0.,  0.])
->>> angle = np.radians([0,45,0])                     
+>>> angle = np.radians([0,45,0])
 >>> o = Orientation(Eulers=angle, symmetry="cubic")
->>> np.round(o.IPFcolor( [0,0,1] ),3)                
+>>> np.round(o.IPFcolor( [0,0,1] ),3)
 array([ 0.,  1.,  0.])
->>> angle = np.radians([0,55,45])                      
+>>> angle = np.radians([0,55,45])
 >>> o = Orientation(Eulers=angle, symmetry="cubic")
->>> np.round(o.IPFcolor( [0,0,1] ),3)                
+>>> np.round(o.IPFcolor( [0,0,1] ),3)
 array([ 0.  ,  0.09,  1.  ])
 
 \endverbatim
 
-\subsection example1b Example: [111] direction is difficult to ad-hoc define by angles. Use vectors to calculate
+\subsection exampleColorsb Example: [111] direction is difficult to ad-hoc define by angles. Use vectors to calculate
 and verify
 \image html ebsd_Orientation1.png
 \verbatim
@@ -62,9 +62,9 @@ array([ 0.,  0.,  1.])
 OIM software shows the 2D projection with the RD upward. Note, many textbooks have the RD downward. ND is always pointing out of the plane; TD changes depending on RD
 \verbatim
 >>> o = Orientation(Eulers=np.radians([0,10,10]), symmetry="cubic")
->>> o.plot(proj2D='RDup')                              #doctest: +SKIP
->>> o.plot(proj2D='RDup', scale=1.5)                   #doctest: +SKIP
->>> o.plot(axis=[1,0,0], proj2D='RDup', scale=1.5)     #doctest: +SKIP
+>>> o.plot( )                                          #doctest: +SKIP
+>>> o.plot(proj2D='up-left')                              #doctest: +SKIP
+>>> o.plot(axis=[1,0,0], proj2D='up-left', scale=1.5)     #doctest: +SKIP
 >>> o.plot(axis=[1,1,1])                               #doctest: +SKIP
 >>> o.toScreen(equivalent=False)
 Euler angles: [  0.  10.  10.]

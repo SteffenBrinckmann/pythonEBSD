@@ -76,8 +76,6 @@ class EBSD:
 
     # for plotting: determine image and imageSize once, use multiple times
     self.image   = None
-    self.widthPixel = -1
-    self.heightPixel= -1
     self.mask    = self.CI > -1         #all are visible initially
     self.vMask = np.ones_like(self.x, dtype=np.bool)
     print "   Duration init: ",int(np.round(time.time()-startTime)),"sec"
@@ -563,15 +561,14 @@ class EBSD:
       cmap = cm.Spectral
       cmap.set_bad('k', 1.0)
     #create a new grid with the given resolution, and interpolate
-    self.widthPixel  = widthPixel
     xMax = np.max(self.x[self.vMask])
     xMin = np.min(self.x[self.vMask])
     yMax = np.max(self.y[self.vMask])
     yMin = np.min(self.y[self.vMask])
     self.ratio       = (xMax-xMin)/ (yMax-yMin)
-    self.heightPixel = int(widthPixel/self.ratio)
-    xAxis = np.linspace(xMin, xMax, self.widthPixel)
-    yAxis = np.linspace(yMin, yMax, self.heightPixel)
+    heightPixel = int(widthPixel/self.ratio)
+    xAxis = np.linspace(xMin, xMax, widthPixel)
+    yAxis = np.linspace(yMin, yMax, heightPixel)
     x, y = np.meshgrid(xAxis, yAxis)
     z = mlab.griddata( self.x[self.vMask], self.y[self.vMask], vector[self.vMask],  x,y, interpolationType)
     mask = mlab.griddata( self.x[self.vMask], self.y[self.vMask], ~self.mask[self.vMask],  x,y, interpolationType)
@@ -606,15 +603,14 @@ class EBSD:
        fileName: save to file instead of showing
     """
     #create a new grid with the given resolution
-    self.widthPixel  = widthPixel
     xMax = np.max(self.x[self.vMask])
     xMin = np.min(self.x[self.vMask])
     yMax = np.max(self.y[self.vMask])
     yMin = np.min(self.y[self.vMask])
     self.ratio       = (xMax-xMin)/ (yMax-yMin)
-    self.heightPixel = int(widthPixel/self.ratio)
-    xAxis = np.linspace(xMin, xMax,  self.widthPixel)
-    yAxis = np.linspace(yMin, yMax, self.heightPixel)
+    heightPixel = int(widthPixel/self.ratio)
+    xAxis = np.linspace(xMin, xMax,  widthPixel)
+    yAxis = np.linspace(yMin, yMax,  heightPixel)
     x, y = np.meshgrid(xAxis, yAxis)
     #filter out using the mask: assign 0 to the mask on the rgb values
     #  ensure that the left hand right side of = have the same mask
@@ -627,7 +623,7 @@ class EBSD:
     blue  = np.uint8(mlab.griddata( self.x[self.vMask], self.y[self.vMask], rgb[2,self.vMask],   x,y, interpolationType)*255)
     #put them all in one array and then reshape it and transpose by changing the order to 0->2->1 (determined by try and error)
     allColors = np.concatenate( (red, green, blue), axis=1)
-    imageArray = np.transpose( allColors.reshape(self.heightPixel, 3, self.widthPixel), (0,2,1) )
+    imageArray = np.transpose( allColors.reshape(heightPixel, 3, widthPixel), (0,2,1) )
     #finally plot
     self.image  = Image.fromarray( imageArray )
     plt.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
@@ -678,15 +674,14 @@ class EBSD:
 
   def addSymbol(self, x, y, fileName=None, scale=1., colorCube='black'):
     """
-      if proj2D=='RDdown':
-        ax.plot( [start[1]]+[start[1]+delta[1]],
-                 [-start[0]]+[-start[0]-delta[0]],
-                 color=color,lw=lw, marker=marker, markersize=markerSize)
-      elif proj2D=='RDup':
-        ax.plot( [-start[1]]+[-start[1]-delta[1]],
-                 [start[0]]+[start[0]+delta[0]],
-                 color=color,lw=lw, marker=marker, markersize=markerSize)
+    Add symbol of crystal orientation (symmetry and rotation) to IPF at given location
 
+    Args:
+       x: x-coordinate
+       y: y-coordinate
+       fileName: export to file
+       scale: scale of symbol
+       colorCube: color of symbol
     """
     def plotLine(ax, start,delta,color='k',lw=1):
       ax.plot( [start[0]]+[start[0]+delta[0]],
@@ -711,14 +706,18 @@ class EBSD:
 
     iClose      = np.argmin((self.x-x)**2 + (self.y-y)**2)
     iQuaternion = self.quaternions[iClose]
+    print "Euler angles at point:",iQuaternion.asEulers(degrees=True, round=1)
     loc         = np.array([x,y,0])
     for sym in self.sym:
       if sym.__repr__() == None: continue
       for line in sym.unitCell():
         start = iQuaternion*(np.array(line[:3],dtype=np.float)*scale)
         end   = iQuaternion*(np.array(line[3:],dtype=np.float)*scale)
-        start = np.array([start[1], start[0], -start[2]])
-        end   = np.array([end[1],   end[0],   -end[2]])
+        #use OIM coordinate system: up-left: new vector (-y, x, z)
+        #use imshow with upper origin: second coordinate negative -> (-y, -x, z)
+        start = np.array([-start[1], -start[0],  start[2]])
+        end   = np.array([-end[1],   -end[0],    end[2]])
+        # once the orientation of crystal is correct: add location
         if start[2]<0 and end[2]<0:
           plotLine(ax, start+loc, end-start,color=colorCube,lw=0.2)
         elif start[2]>0 and end[2]>0:
@@ -768,22 +767,23 @@ class EBSD:
        scale: of font and rectangle. Default: widthInPixel / 16, which is for a 1024x786 image = 64
        alpha: transparency of scale bar background
     """
+    widthPixel, heightPixel = self.image.size
     if barLength is None:
       digits = int(math.log10(round(self.width/4.)))
       barLength = round(   max(self.width,self.height)   /6., -digits)
-    barPixel = int(self.widthPixel * barLength/self.width)
+    barPixel = int(widthPixel * barLength/self.width)
     image = self.image.copy()
     draw = ImageDraw.Draw(image, 'RGBA')
     if scale < 0:
-      if self.widthPixel>self.heightPixel:  scale = self.widthPixel  / 32
-      else:                                 scale = self.heightPixel / 16
+      if widthPixel>heightPixel:  scale = widthPixel  / 32
+      else:                       scale = heightPixel / 16
     font = ImageFont.truetype(self.fontFile,scale/5*3)
     #identify top-left corner of scale bar section
-    if   site=="BL":  offsetX = 0;                                   offsetY = self.heightPixel-scale
-    elif site=="BR":  offsetX = self.widthPixel-barPixel-scale/5; offsetY = self.heightPixel-scale
+    if   site=="BL":  offsetX = 0;                                   offsetY = heightPixel-scale
+    elif site=="BR":  offsetX = widthPixel-barPixel-scale/5; offsetY = heightPixel-scale
     elif site=="TL":  offsetX = 0;                                   offsetY = 0
-    elif site=="TR":  offsetX = self.widthPixel-barPixel-scale/5; offsetY = 0
-    else:             offsetX = 0;                                   offsetY = self.heightPixel-scale
+    elif site=="TR":  offsetX = widthPixel-barPixel-scale/5; offsetY = 0
+    else:             offsetX = 0;                                   offsetY = heightPixel-scale
     textString = str(barLength)+" "+u'\u03BC'+"m"
     textWidth, textHeight = draw.textsize( textString, font=font)
     draw.rectangle((offsetX,        offsetY,         offsetX+barPixel+scale/5,  offsetY+scale    ), (255, 255, 255, int(alpha*255)))  #white background
@@ -802,9 +802,14 @@ class EBSD:
       plt.close()
     return
 
-  def plotPF(self, axis=[1,0,0], points=True, fileName=None, color='#1f77b4', alpha=1.0, show=True, density=256, size=2, proj2D='RDup'):
+
+  def plotPF(self, axis=[1,0,0], points=True, fileName=None, color='#1f77b4', alpha=1.0, show=True, density=256, size=2, proj2D='up-left'):
     """
     plot pole figure
+
+    Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)
+    - down-right: [default in text books, mTex] RD = x = down; TD = y = right; ND = z = outOfPlane
+    - up-left: [default in OIM and here] RD = x = up; TD = y = left; ND = z = outOfPlane
 
     Args:
       axis:    axis to plot: default: axis=1,0,0
@@ -815,7 +820,7 @@ class EBSD:
       show:    show figure [default], False for subsequent plotting
       density: how many points to plot on the distribution
       size:    points: point size; distribution: amount of smoothing: higher more smoothing
-      proj2D:  orientation of 2D projection: [RDdown(Most softwarde, mTex), RDup(OIM)]
+      proj2D:  orientation of 2D projection: [down-right, up-left, None]
     """
     startTime = time.time()
     maxColor = tuple(np.array(colors.hex2color(color))*0.5)
@@ -838,9 +843,9 @@ class EBSD:
         else:
           x,y = np.hstack((x,direction[0,:])), np.hstack((y,direction[1,:]))
     if points:
-      if proj2D=='RDdown':
+      if proj2D=='down-right':
         plt.plot(-x, y,'.', color=maxColor, markersize=size)  #markersize=0.05
-      elif proj2D=='RDup':
+      elif proj2D=='up-left':
         plt.plot(-y, x,'.', color=maxColor, markersize=size)  #markersize=0.05
       else:
         return
@@ -853,8 +858,8 @@ class EBSD:
       imgDim = density+2*size
       img = np.zeros((imgDim,imgDim))
       x,y = np.nan_to_num(x), np.nan_to_num(y)
-      if proj2D=='RDdown':   zippedList = zip(-x,y)
-      elif proj2D=='RDup':   zippedList = zip(-y,x)
+      if proj2D=='down-right':   zippedList = zip(-x,y)
+      elif proj2D=='up-left':   zippedList = zip(-y,x)
       else:                  return
       for x_, y_ in zippedList:
         ix = int((x_ - -1.) * center) + size

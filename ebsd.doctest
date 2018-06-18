@@ -75,7 +75,7 @@ How to export txt-file from OIM that can be read:
   - Partition->export-> grain file -> use "grain file type 1"
   - Partition->export-> partition data -> save as .ang (includs no grain  information, can be used to )
 
-Warning: This is example does not exist, anymore
+Warning: This is example input file does not exist, anymore
 \verbatim
 > e = EBSD("Examples/Test.ang")
 > e.loadTXT("Examples/TestB.txt")
@@ -154,10 +154,10 @@ Equivalent orientations - Euler angles:
    [203.0  121.5  137.6]
    [ 83.2  129.0  317.8]
    [263.2   51.0  222.2]
->>> o.plot(proj2D='RDup')
+>>> o.plot(proj2D='up-left')
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 484157029
->>> o.plot(axis=[1,0,0],proj2D='RDup',scale=1.5)
+>>> o.plot(axis=[1,0,0],proj2D='up-left',scale=1.5)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 484592869
 
@@ -192,7 +192,7 @@ Load .ang file:  Examples/EBSD.ang
 >>> e.maskCI( 0.001 )
 >>> e.plotPF(size=1)                       #doctest: +SKIP
 >>> e.plotPF(points=False)                 #doctest: +SKIP
->>> e.plotPF(points=False, proj2D='RDdown')
+>>> e.plotPF(points=False, proj2D='down-right')
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 479681163
 

@@ -239,10 +239,14 @@ class Orientation:
   def plot(self, axis=None, scale=2, proj2D=None, show=True):
     """Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles
 
+    Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)
+    - down-right: [default in text books] RD = x = down; TD = y = right; ND = z = outOfPlane
+    - up-left: [default in OIM] RD = x = up; TD = y = left; ND = z = outOfPlane
+
     Args:
        axis: if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles
        scale: scale of pole-figure dome over crystal
-       proj2D: do a normal projection onto 2D plane: [RDdown(Default), RDup(OIM), None]
+       proj2D: do a normal projection onto 2D plane: [down-right, up-left, None]
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
@@ -259,11 +263,11 @@ class Orientation:
         marker='o';  markerSize=7
       else:
         marker=None; markerSize=0
-      if proj2D=='RDdown':
+      if proj2D=='down-right':
         ax.plot( [start[1]]+[start[1]+delta[1]],
                  [-start[0]]+[-start[0]-delta[0]],
                  color=color,lw=lw, marker=marker, markersize=markerSize)
-      elif proj2D=='RDup':
+      elif proj2D=='up-left':
         ax.plot( [-start[1]]+[-start[1]-delta[1]],
                  [start[0]]+[start[0]+delta[0]],
                  color=color,lw=lw, marker=marker, markersize=markerSize)
@@ -277,17 +281,28 @@ class Orientation:
       start, end = np.array(line[:3],dtype=np.float), np.array(line[3:],dtype=np.float)
       start = self.quaternion*start
       end   = self.quaternion*end
-      if (start[2]+end[2])<0: plotLine(start, end-start,color='b',lw=1)
-      else:                   plotLine(start, end-start,color='b',lw=3)
-
+      if start[2]<0 and end[2]<0:
+        plotLine(start, end-start,color="b",lw=0.2)
+      elif start[2]>0 and end[2]>0:
+        plotLine(start, end-start,color="b",lw=2)
+      else:
+        delta = end-start
+        k     = -start[2]/delta[2]
+        mid   = start+k*delta
+        if start[2]>0:
+          plotLine(start, mid-start,color="b",lw=2)
+          plotLine(mid,   end-mid,color="b",lw=0.2)
+        else:
+          plotLine(start, mid-start,color="b",lw=0.2)
+          plotLine(mid,   end-mid,color="b",lw=2)
     plotLine([0,0,0], [1,0,0], 'k',lw=3)
     plotLine([0,0,0], [0,1,0], 'k',lw=3)
     plotLine([0,0,0], [0,0,1], 'k',lw=3)
-    if proj2D=='RDdown':
+    if proj2D=='down-right':
       ax.text(0.1,-1,"RD [100]")
       ax.text(1,-0.1,"TD [010]")
       ax.text(0.1,-0.1,"ND [001]")
-    elif proj2D=='RDup':
+    elif proj2D=='up-left':
       ax.text(-0.1,1,"RD [100]")
       ax.text(-1,0.1,"TD [010]")
       ax.text(-0.1,0.1,"ND [001]")
