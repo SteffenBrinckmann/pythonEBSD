@@ -4,9 +4,11 @@
 # @brief Class to allow for read EBSD data
 #
 import math, Image, time, os, sys
+import ImageDraw, ImageFont, ImageChops
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.ndimage as ndi
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from matplotlib import mlab
 from matplotlib import colors
 from scipy.stats import gaussian_kde
@@ -62,6 +64,7 @@ class EBSD:
     else:
       print "This file-extension is not implemented yet"
       sys.exit(2)
+    if self.stepSizeY is None: self.stepSizeY=self.stepSizeX
     print "   Read file with step size:",self.stepSizeX, self.stepSizeY
     print "   Optimal image pixel size:",int(self.width/self.stepSizeX)
     print "   Number of points:",len(self.x)
@@ -72,7 +75,7 @@ class EBSD:
     del self.phi1; del self.PHI; del self.phi2
 
     # for plotting: determine image and imageSize once, use multiple times
-    self.image   = ""
+    self.image   = None
     self.widthPixel = -1
     self.heightPixel= -1
     self.mask    = self.CI > -1         #all are visible initially
@@ -539,20 +542,22 @@ class EBSD:
   #@{
 
 
-  def plot(self, vector, widthPixel=256, maximum="", minimum="", interpolationType="nn", cmap=None, show=True, cbar=True):
+  def plot(self, vector, widthPixel=None, maximum="", minimum="", interpolationType="nn", cmap=None, show=True, cbar=True):
     """
     given a class-vector, plot the vector as an image<br>
     the x and y are given by the class-vector x and y
 
     Args:
        vector: vector to be plotted as a 2D image
-       widthPixel: rescale to horizontal size of the image [default: 256 pixel]
+       widthPixel: rescale to horizontal size of the image [default: optimal pixel width]
        maximum: rescale z-scale to maximal value
        minimum: rescale z-scale to minimal value
        interpolationType: interpolation type [default: "nn" next-neighbor]
     """
     startTime = time.time()
-    import matplotlib.cm as cm
+    if widthPixel is None:
+      widthPixel = int(self.width/self.stepSizeX)
+
     #create a special cmap palette with blacK as value for bad-numbers
     if cmap is None:
       cmap = cm.Spectral
@@ -629,13 +634,13 @@ class EBSD:
     return
 
 
-  def plotIPF(self, direction="ND", widthPixel=256, fileName=None, interpolationType="nn"):
+  def plotIPF(self, direction="ND", widthPixel=None, fileName=None, interpolationType="nn"):
     """
     plot Inverse Pole Figure (IPF)
 
     Args:
        direction: default.."ND", "RD", "TD"
-       widthPixel: horizontal size of the image [default: 256 pixel]
+       widthPixel: horizontal size of the image [default: optimal size based on data]
        interpolationType: interpolation type [default: "nn" next-neighbor]
        fileName: save to file instead of showing
     """
@@ -645,7 +650,9 @@ class EBSD:
     elif direction=="ND": axis = [0,0,1]
     else:              #if first argument specifies widthPixel
       widthPixel = direction
-      axis = [0,0,1]     
+      axis = [0,0,1]
+    if widthPixel is None:
+      widthPixel = int(self.width/self.stepSizeX)
 
     flags = np.zeros( (len(self.x)), dtype=np.bool)
     rgbs  = np.zeros( (3,len(self.x)), dtype=np.float)
@@ -669,6 +676,86 @@ class EBSD:
     return
 
 
+  def addSymbol(self, x, y, fileName=None, scale=1., colorCube='black'):
+    """
+      if proj2D=='RDdown':
+        ax.plot( [start[1]]+[start[1]+delta[1]],
+                 [-start[0]]+[-start[0]-delta[0]],
+                 color=color,lw=lw, marker=marker, markersize=markerSize)
+      elif proj2D=='RDup':
+        ax.plot( [-start[1]]+[-start[1]-delta[1]],
+                 [start[0]]+[start[0]+delta[0]],
+                 color=color,lw=lw, marker=marker, markersize=markerSize)
+
+    """
+    def plotLine(ax, start,delta,color='k',lw=1):
+      ax.plot( [start[0]]+[start[0]+delta[0]],
+               [start[1]]+[start[1]+delta[1]],
+               color=color,lw=lw)
+      return
+    def trim(im):
+      bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
+      diff = ImageChops.difference(im, bg)
+      diff = ImageChops.add(diff, diff, 2.0, -100)
+      bbox = diff.getbbox()
+      if bbox:
+        return im.crop(bbox)
+
+    fig = plt.figure()
+    ax  = fig.add_subplot (111)
+    xMax = np.max(self.x[self.vMask])
+    xMin = np.min(self.x[self.vMask])
+    yMax = np.max(self.y[self.vMask])
+    yMin = np.min(self.y[self.vMask])
+    ax.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
+
+    iClose      = np.argmin((self.x-x)**2 + (self.y-y)**2)
+    iQuaternion = self.quaternions[iClose]
+    loc         = np.array([x,y,0])
+    for sym in self.sym:
+      if sym.__repr__() == None: continue
+      for line in sym.unitCell():
+        start = iQuaternion*(np.array(line[:3],dtype=np.float)*scale)
+        end   = iQuaternion*(np.array(line[3:],dtype=np.float)*scale)
+        start = np.array([start[1], start[0], -start[2]])
+        end   = np.array([end[1],   end[0],   -end[2]])
+        if start[2]<0 and end[2]<0:
+          plotLine(ax, start+loc, end-start,color=colorCube,lw=0.2)
+        elif start[2]>0 and end[2]>0:
+          plotLine(ax, start+loc, end-start,color=colorCube,lw=2)
+        else:
+          delta = end-start
+          k     = -start[2]/delta[2]
+          mid   = start+k*delta
+          if start[2]>0:
+            plotLine(ax, start+loc, mid-start,color=colorCube,lw=2)
+            plotLine(ax, mid+loc,   end-mid,color=colorCube,lw=0.2)
+          else:
+            plotLine(ax, start+loc, mid-start,color=colorCube,lw=0.2)
+            plotLine(ax, mid+loc,   end-mid,color=colorCube,lw=2)
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.axis('off')
+    fig.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
+    #fig.tight_layout()
+    #plt.show()
+    fig.canvas.draw()  # draw the renderer
+    w,h = fig.canvas.get_width_height()
+    buf = np.fromstring ( fig.canvas.tostring_argb(), dtype=np.uint8 )
+    buf.shape = ( w, h,4 ) # Get the RGBA buffer from the figure
+    buf = np.roll( buf, 3, axis = 2 )
+    image = Image.fromstring( "RGBA", (w,h), buf.tostring() )
+    self.image = trim(image)
+    plt.cla();     plt.clf()
+    plt.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
+    if fileName == None:
+      plt.show()
+    else:
+      plt.savefig(fileName, dpi=150, bbox_inches='tight')
+      plt.close()
+    return
+
+
+
   def addScaleBar(self, fileName=None, site="BL", barLength=None, scale = -1, alpha=0.5):
     """
     Add scale-bar to image
@@ -681,7 +768,6 @@ class EBSD:
        scale: of font and rectangle. Default: widthInPixel / 16, which is for a 1024x786 image = 64
        alpha: transparency of scale bar background
     """
-    import ImageDraw, ImageFont
     if barLength is None:
       digits = int(math.log10(round(self.width/4.)))
       barLength = round(   max(self.width,self.height)   /6., -digits)

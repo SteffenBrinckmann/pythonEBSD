@@ -29,21 +29,21 @@ Features:
 >>> from ebsd import EBSD
 >>> e = EBSD("Examples/EBSD.ang")
 Load .ang file:  Examples/EBSD.ang
-   Read file with step size: 0.2 None
+   Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
    Duration init:  0 sec
 >>> e.doctest=True
 >>> e.plot(e.CI)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 436385537
+doctest 435633376
 >>> e.maskCI( 0.1 )
 >>> e.plot( e.CI )
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 430531950
+doctest 429497716
 >>> e.plotIPF()
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 446389225
+doctest 446435030
 >>> e.plotIPF(1024)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 446366814
@@ -95,7 +95,7 @@ Which can then be read in OIM again
 >>> from ebsd_Orientation import Orientation
 >>> e = EBSD("Examples/EBSD.ang")
 Load .ang file:  Examples/EBSD.ang
-   Read file with step size: 0.2 None
+   Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
    Duration init:  0 sec
@@ -184,7 +184,7 @@ Finally, inspect pole-figure of data and compare OIM software, mTex and this pyt
 \verbatim
 >>> e = EBSD("Examples/EBSD.ang")
 Load .ang file:  Examples/EBSD.ang
-   Read file with step size: 0.2 None
+   Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
    Duration init:  0 sec
@@ -236,13 +236,60 @@ Issues from mTex:
 </ul>
 \endhtmlonly
 
+\subsection compare Compare the three software for bicrystal
+\htmlonly
+<table border=1>
+<tr><td><center>description</center></td>
+  <td><center>OIM software</center></td>
+  <td><center>mTex software</center></td>
+  <td><center>this python code</center></td></tr>
+<tr><td><center>IPF ND*</center> </td>
+  <td><image src="../HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
+  <td><image src="../HTMLInput/bc_mTex_ND.png"   width=300px></td>
+  <td><image src="../HTMLInput/bc_py_ND.png"     width=300px></td></tr>
+<tr><td><center>IPF RD</center> </td>
+  <td><image src="../HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
+  <td><center>I cannot produce</center></td>
+  <td><image src="../HTMLInput/bc_py_RD.png"     width=300px></td></tr>
+<tr><td><center>PF [100]</center> </td>
+  <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
+  <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
+  <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+\endhtmlonly
+
+Python code
+\verbatim
+e = EBSD("Examples/EBSD.ang")
+e.cropVMask(ymin=35)
+e.plotIPF("ND",fileName="pythonND.png")
+e.addSymbol(5,37, scale=2)
+e.addSymbol(18,37, scale=2,fileName="pythonND.png")
+e.plotIPF("RD",fileName="pythonRD.png")
+e.addSymbol(5,37, scale=2)
+e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
+e.plotIPF("TD",fileName="pythonTD.png")
+e.addSymbol(5,37, scale=2)
+e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
+e.plotPF(      fileName="pythonPF.png")
+\endverbatim
+
+
 \section mTex how to run mTex
 \verbatim
 >> startup_mtex
->> import_wizard('ebsd') %and select EBSD.osc
+>> import_wizard('ebsd')
+% and select EBSD.osc
+% select plotting convention 5: x-to-right; y-to-bottom
+% select "convert Euler 2 Spacial Referecence Frame"
+% save to workspace variable
 >> csCopper = ebsd('Cu').CS;
 >> plot(ebsd('Cu'),ebsd('Cu').orientations,'coordinates','on')
+>> cS = crystalShape.cube(ebsd.CS)
+>> region = [0 35 50 50];
+>> ebsdC  = ebsd(inpolygon(ebsd,region))
+>> plot(ebsdC('Cu'),ebsdC('Cu').orientations,'coordinates','on')
 >> plotPDF(ebsd('Cu').orientations, Miller({1 0 0},csCopper))
+% select xNorth zOutOfPlane as axis in mTex
 >> plotPDF(ebsd('Cu').orientations, Miller({1 1 1},csCopper))
 >> odf = calcODF(ebsd('Cu').orientations)
 >> plotPDF(odf,Miller({1 0 0},csCopper) )
@@ -265,7 +312,11 @@ select xNorth zOutOfPlane as axis in mTex
 
 \section developerHints Hints for developers
 - run ./verifyAll.py after all changes to verify the code and create the html-documentation
-
+- git commands
+    - git add -A
+    - git gui
+    - git commit -m "solved symbolic link issue"
+    - git push -u origin master
 
 
 */

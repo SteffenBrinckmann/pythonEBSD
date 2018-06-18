@@ -16,7 +16,16 @@ for fileName in os.listdir("."):
     txtFile.close()
     doxyFile.close()
 
-os.unlink("doxygenOutput.txt")
+if os.path.exists('doxygenOutput.txt'):
+  os.unlink("doxygenOutput.txt")
 os.system("doxygen")
 os.system("rm *.doxy")
-os.unlink('doctest.png')
+if os.path.exists('doctest.png'):
+  os.unlink('doctest.png')
+
+#commit to github
+message = raw_input("Enter github message? [empty: no commit] ")
+if len(message)>3:
+  os.system("git add -A")
+  os.system('git commit -m "'+message+'"')
+  os.system('git push -u origin master')
