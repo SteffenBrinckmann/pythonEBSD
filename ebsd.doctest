@@ -60,10 +60,10 @@ doctest 446380620
 doctest 432026847
 >>> e.plotPF([1,0,0])
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 487223361
->>> e.plotPF([1,0,0],points=False)
+doctest 485770305
+>>> e.plotPF([1,0,0],points=True)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 480622547
+doctest 487223361
 
 \endverbatim
 
@@ -174,10 +174,10 @@ Void mode 318.|125.|219.6|0|2
 >>> e.doctest = True
 >>> e.plotPF(size=5)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 487459491
->>> e.plotPF(points=False)
+doctest 485115848
+>>> e.plotPF(points=True)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 480661209
+doctest 487487736
 
 \endverbatim
 Finally, inspect pole-figure of data and compare OIM software, mTex and this python code
@@ -191,10 +191,10 @@ Load .ang file:  Examples/EBSD.ang
 >>> e.doctest = True
 >>> e.maskCI( 0.001 )
 >>> e.plotPF(size=1)                       #doctest: +SKIP
->>> e.plotPF(points=False)                 #doctest: +SKIP
->>> e.plotPF(points=False, proj2D='down-right')
+>>> e.plotPF()                 #doctest: +SKIP
+>>> e.plotPF(proj2D='down-right')
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 479681163
+doctest 485217143
 
 \endverbatim
 \htmlonly
