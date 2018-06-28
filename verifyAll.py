@@ -26,10 +26,12 @@ if os.path.exists('doctest.png'):
 #commit to github
 message = raw_input("Enter github message? [empty: no commit] ")
 if len(message)>3:
-  with open(".gitignore", "rt") as fin:
-    with open("out.txt", "wt") as fout:
-      for line in fin:
-        fout.write(line.replace('A', 'Orange'))
+  gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\nHTMLInput/\nBackupEBSD\n"
+  gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\nHTMLInput/\nBackupEBSD\n"
+  with open(".gitignore", "rt") as fout:
+    fout.write(gitignoreRemote)
   os.system("git add -A")
   os.system('git commit -m "'+message+'"')
   os.system('git push -u origin master')
+  with open(".gitignore", "rt") as fout:
+    fout.write(gitignoreLocal)

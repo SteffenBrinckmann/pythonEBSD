@@ -23,10 +23,12 @@ corresponding pole-figure
 ![Pole figure](HTMLInput/ebsd_py_PF100.png)
 
 
+# Documentation
+[Documentation on github pages](https://steffenbrinckmann.github.io/pythonEBSD/index.html)
+
 # What features I do not envision:
   - include all crystal symmetries (materials science can mostly live with few)
   - other Euler angle definitions than Bunge; materials science does not use those
-
 
 # Future features
   - introduce Kernel average misorientation
