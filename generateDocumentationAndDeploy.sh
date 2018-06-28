@@ -30,7 +30,7 @@ __AUTHOR__="Jeroen de Bruijn"
 # the gh-pages branch of a repository specified by GH_REPO_REF.
 # Before this script is used there should already be a gh-pages branch in the
 # repository.
-# 
+#
 ################################################################################
 
 ################################################################################
@@ -44,8 +44,9 @@ mkdir code_docs
 cd code_docs
 
 # Get the current gh-pages branch
-git clone -b gh-pages https://git@$GH_REPO_REF
-cd $GH_REPO_NAME
+git clone -b gh-pages https://git@github.com/SteffenBrinckmann/pythonEBSD.git
+cd pythonEBSD
+
 
 ##### Configure git.
 # Set the push default to simple i.e. push only the current branch.
@@ -70,8 +71,9 @@ echo "" > .nojekyll
 ################################################################################
 ##### Generate the Doxygen code documentation and log the output.          #####
 echo 'Generating Doxygen code documentation...'
+pwd
 # Redirect both stderr and stdout to the log file AND the console.
-doxygen $DOXYFILE 2>&1 | tee doxygen.log
+doxygen ../Doxyfile 2>&1 | tee doxygen.log
 
 ################################################################################
 ##### Upload the documentation to the gh-pages branch of the repository.   #####

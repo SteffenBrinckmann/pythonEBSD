@@ -10,7 +10,7 @@ branches:
 env:
   global:
     - GH_REPO_NAME: pythonEBSD
-    - DOXYFILE: $TRAVIS_BUILD_DIR/
+    - DOXYFILE: Doxyfile
     - GH_REPO_REF: github.com/SteffenBrinckmann/pythonEBSD.git
 
 # Install dependencies
