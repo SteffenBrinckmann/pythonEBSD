@@ -9,7 +9,7 @@ branches:
 # Environment variables
 env:
   global:
-    - GH_REPO_NAME: <your_repo>
+    - GH_REPO_NAME: pythonEBSD
     - DOXYFILE: $TRAVIS_BUILD_DIR/
     - GH_REPO_REF: github.com/SteffenBrinckmann/pythonEBSD.git
 
