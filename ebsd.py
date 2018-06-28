@@ -65,6 +65,8 @@ class EBSD:
       print "This file-extension is not implemented yet"
       sys.exit(2)
     if self.stepSizeY is None: self.stepSizeY=self.stepSizeX
+    if self.stepSizeX<0.00001 and self.stepSizeY>0.00001:
+      self.stepSizeX = self.stepSizeY
     print "   Read file with step size:",self.stepSizeX, self.stepSizeY
     print "   Optimal image pixel size:",int(self.width/self.stepSizeX)
     print "   Number of points:",len(self.x)
@@ -343,7 +345,7 @@ class EBSD:
       except:
         cprData[title][key.lower()] = value.lower()
     cprFile.close()
-    #print "Meta data",cprData
+    #print "META DATA",cprData
     self.stepSizeX = np.double(cprData['job']['griddistx'])
     self.stepSizeY = np.double(cprData['job']['griddisty'])
     xcells         = int(cprData['job']['xcells'])
@@ -353,7 +355,8 @@ class EBSD:
     self.height    = ycells * self.stepSizeY
     self.ratio     = self.width/self.height
     if cprData['phase1']['lauegroup'] == 11:
-      self.sym.append( Symmetry('cubic') )
+      self.sym.append( Symmetry()        )  #phase 0: default = not identified
+      self.sym.append( Symmetry('cubic') )  #phase 1: cubic
     else:
       print "ERROR: no symmetry found"
       return
@@ -418,6 +421,8 @@ class EBSD:
       if 'ReliabilityIndex' in columnNames:
         self.RI[i]      = struct.unpack('f', crcFile.read(4))[0]
     crcFile.close()
+    if not len(self.sym) == np.max(self.phaseID)-np.min(self.phaseID)+1:
+      print "ERRRO in reading CRC: symmetries do not match",len(self.sym), np.max(self.phaseID)-np.min(self.phaseID)+1
     return
 
 
@@ -653,7 +658,7 @@ class EBSD:
     flags = np.zeros( (len(self.x)), dtype=np.bool)
     rgbs  = np.zeros( (3,len(self.x)), dtype=np.float)
     for sym in self.sym:
-      if sym.__repr__() == None: continue
+      if sym.__repr__() == "None": continue
       equivQuaternions = sym.equivalentQuaternions( self.quaternions )
       for equivQuaternion in equivQuaternions:
         pole          = equivQuaternion.conjugated()*axis
@@ -803,7 +808,7 @@ class EBSD:
     return
 
 
-  def plotPF(self, axis=[1,0,0], points=True, fileName=None, color='#1f77b4', alpha=1.0, show=True, density=256, size=2, proj2D='up-left'):
+  def plotPF(self, axis=[1,0,0], points=False, fileName=None, color='#1f77b4', alpha=1.0, show=True, density=256, size=2, proj2D='up-left', vmin=0.0, vmax=1.0):
     """
     plot pole figure
 
@@ -821,6 +826,8 @@ class EBSD:
       density: how many points to plot on the distribution
       size:    points: point size; distribution: amount of smoothing: higher more smoothing
       proj2D:  orientation of 2D projection: [down-right, up-left, None]
+      vmin:    minimum value plotted, used as cut-off for transparency
+      vmax:    max. used in color coding, allows to focus on minor texture
     """
     startTime = time.time()
     maxColor = tuple(np.array(colors.hex2color(color))*0.5)
@@ -859,8 +866,8 @@ class EBSD:
       img = np.zeros((imgDim,imgDim))
       x,y = np.nan_to_num(x), np.nan_to_num(y)
       if proj2D=='down-right':   zippedList = zip(-x,y)
-      elif proj2D=='up-left':   zippedList = zip(-y,x)
-      else:                  return
+      elif proj2D=='up-left':    zippedList = zip(-y,x)
+      else:                      return
       for x_, y_ in zippedList:
         ix = int((x_ - -1.) * center) + size
         iy = int((y_ - -1.) * center) + size
@@ -868,13 +875,13 @@ class EBSD:
             img[iy][ix] += 1
       img = ndi.gaussian_filter(img, (size,size))  # gaussian convolution
       img /= np.max(img)                               # normalize
-      img[img<0.01] = np.nan                           #filter out low values to make transparent
-      plt.imshow(img, cmap=cmap, alpha=alpha, vmin=0.0, origin='lower')
+      img[img<vmin] = np.nan                           #filter out low values to make transparent
+      plt.imshow(img, cmap=cmap, alpha=alpha, vmin=0.0, vmax=vmax,origin='lower')
       plt.plot( center*np.cos(np.linspace(0,2*np.pi,100))+center+size,
                 center*np.sin(np.linspace(0,2*np.pi,100))+center+size, 'k-', lw=2)
       plt.plot( [center+size,center+size], [size,imgDim-size], 'k--', lw=1)
       plt.plot( [size,imgDim-size], [center+size,center+size], 'k--', lw=1)
-      plt.colorbar()
+      #plt.colorbar()
     plt.xlim([-1,1]) ; plt.ylim([-1,1])
     plt.xticks([])   ; plt.yticks([])
     plt.axis('equal'); plt.axis('off')

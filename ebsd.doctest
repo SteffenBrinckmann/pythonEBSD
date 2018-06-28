@@ -70,10 +70,10 @@ doctest 480622547
 \image html ebsd_py_ND.png
 
 
-\subsection example2 Example: Interaction with OIM Software: to update grain information from different file
+\subsection example2 Example: Interaction with OIM Software to update grain information from different file
 How to export txt-file from OIM that can be read:
-  - Partition->export-> grain file -> use "grain file type 1"
-  - Partition->export-> partition data -> save as .ang (includs no grain  information, can be used to )
+  - Partition->export-> grain file -> use "grain file type 1" (saves a txt file)
+  - Partition->export-> partition data -> save as .ang
 
 Warning: This is example input file does not exist, anymore
 \verbatim
@@ -156,10 +156,10 @@ Equivalent orientations - Euler angles:
    [263.2   51.0  222.2]
 >>> o.plot(proj2D='up-left')
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 484157029
+doctest 485619933
 >>> o.plot(axis=[1,0,0],proj2D='up-left',scale=1.5)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 484592869
+doctest 485534411
 
 \endverbatim
 Create artificial ebsd pattern to check PF

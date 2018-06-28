@@ -334,7 +334,6 @@ class Symmetry:
   # @name Math routines to convert between HKL, XY, RGB
   #@{
 
-  @classmethod
   def xyToHKL(self, inPlane):
       """
       convert xy (coordinates in projection plane (-1<x<1,-1<y<1)) -> hkl
@@ -402,9 +401,9 @@ class Symmetry:
     for iY in np.arange(0,0.366025403784,stepSize):
       for iX in np.arange(iY,0.41421,stepSize):
         if func(iY)<=iX: continue
-    xy.append( [iX,iY])
+        xy.append( [iX,iY])
     xy = np.array(xy)
-    hkl=Symmetry.xyToHKL(xy.T)
+    hkl=self.xyToHKL(xy.T)
     flags, rgb = self.inSST(hkl, color=True, proper=False)
     colors = []
     for i in range(rgb.shape[1]):
@@ -420,7 +419,6 @@ class Symmetry:
     plt.text(0.37,0.37,'[111]')
     plt.axis('off')
     plt.axis('equal')
-    plt.tight_layout(pad=-0.15)
     if fileName:
       plt.savefig(fileName)
     if show:
