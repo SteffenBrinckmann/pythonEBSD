@@ -77,7 +77,6 @@ Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
 &gt;&gt;&gt; e.plot(e.CI)
 &gt;&gt;&gt; e.maskCI( 0.1 )
 &gt;&gt;&gt; e.plot( e.CI )
@@ -99,7 +98,7 @@ Example: Interaction with OIM Software to update grain information from differen
 <li>Partition-&gt;export-&gt; grain file -&gt; use "grain file type 1" (saves a txt file)</li>
 <li>Partition-&gt;export-&gt; partition data -&gt; save as .ang</li>
 </ul>
-<p>Warning: This is example input file does not exist, anymore </p>
+<p>Warning: This is example input file does not exist, anymore. Not tested </p>
 <pre class="fragment">&gt; e = EBSD("Examples/Test.ang")
 &gt; e.loadTXT("Examples/TestB.txt")
 &gt; e.maskCI(0.1)
@@ -115,7 +114,6 @@ Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
 &gt;&gt;&gt; e.maskCI( 0.001 )
 &gt;&gt;&gt; e.plotIPF('ND')                        
 &gt;&gt;&gt; e.cropVMask(xmin=18,ymin=12,ymax=17)
@@ -171,7 +169,6 @@ Void mode 318.|125.|219.6|0|2
    Read file with step size: 1.0 1.0
    Optimal image pixel size: 1
    Number of points: 4
-   Duration init:  0 sec
 &gt;&gt;&gt; e.plotPF(size=5)
 &gt;&gt;&gt; e.plotPF(points=True)</pre><p> Finally, inspect pole-figure of data and compare OIM software, mTex and this python code </p>
 <pre class="fragment">&gt;&gt;&gt; e = EBSD("Examples/EBSD.ang")
@@ -179,7 +176,6 @@ Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
 &gt;&gt;&gt; e.maskCI( 0.001 )
 &gt;&gt;&gt; e.plotPF(size=1)                       
 &gt;&gt;&gt; e.plotPF()                 
@@ -220,7 +216,22 @@ Issues from mTex:
 <image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
 <image src="../HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
 </ul>
-<h2><a class="anchor" id="compare"></a>
+<h2><a class="anchor" id="example4"></a>
+Average orientation in file, does not make sence for this multi-grain case</h2>
+<p>averaging takes lots of time: Orientation.average() </p>
+<pre class="fragment">&gt;&gt;&gt; from ebsd_Orientation import Orientation
+&gt;&gt;&gt; from ebsd import EBSD
+&gt;&gt;&gt; Orients = []
+&gt;&gt;&gt; e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+&gt;&gt;&gt; for i in range(len(e.x)):
+...   Orients.append(Orientation(quaternion=e.quaternions[i], symmetry="cubic"))
+&gt;&gt;&gt; avg = Orientation.average( Orients)
+&gt;&gt;&gt; print "Average orientation",np.round(avg.asEulers(degrees=True, standardRange=True),2)
+Average orientation [  79.12    9.81  281.32]</pre><h2><a class="anchor" id="compare"></a>
 Compare the three software for bicrystal</h2>
  
 <table border=1>
@@ -240,20 +251,26 @@ Compare the three software for bicrystal</h2>
   <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
   <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
   <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+</table>
 <p>Python code </p>
-<pre class="fragment">e = EBSD("Examples/EBSD.ang")
-e.cropVMask(ymin=35)
-e.plotIPF("ND",fileName="pythonND.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonND.png")
-e.plotIPF("RD",fileName="pythonRD.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
-e.plotIPF("TD",fileName="pythonTD.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
-e.plotPF(      fileName="pythonPF.png")
-</pre><h1><a class="anchor" id="mTex"></a>
+<pre class="fragment">&gt;&gt;&gt; from ebsd import EBSD
+&gt;&gt;&gt; e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+&gt;&gt;&gt; e.cropVMask(ymin=35)
+&gt;&gt;&gt; e.plotIPF("ND",fileName="pythonND.png")
+&gt;&gt;&gt; e.addSymbol(5,37, scale=2)
+&gt;&gt;&gt; e.addSymbol(18,37, scale=2,fileName="pythonND.png")
+&gt;&gt;&gt; e.plotIPF("RD",fileName="pythonRD.png")
+&gt;&gt;&gt; e.addSymbol(5,37, scale=2)
+&gt;&gt;&gt; e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
+&gt;&gt;&gt; e.plotIPF("TD",fileName="pythonTD.png")
+&gt;&gt;&gt; e.addSymbol(5,37, scale=2)
+&gt;&gt;&gt; e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
+&gt;&gt;&gt; e.plotPF(      fileName="pythonPF.png")</pre><p> please, note, the last image is not colored. This is not implemented yet. TODO</p>
+<h1><a class="anchor" id="mTex"></a>
 how to run mTex</h1>
 <pre class="fragment">&gt;&gt; startup_mtex
 &gt;&gt; import_wizard('ebsd')
@@ -309,7 +326,7 @@ Hints for developers</h1>
 
 <hr class="footer"/><address class="footer"><small>
 Copyright by Steffen Brinckmann
-<!--Generated on Thu Jun 28 2018 22:15:37 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
+<!--Generated on Mon Nov 19 2018 20:47:55 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5 -->
 </small></address>

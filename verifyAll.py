@@ -11,6 +11,7 @@ for fileName in os.listdir("."):
     doxyFile= open(fileName[:-7]+"doxy",'w')
     for line in txtFile:
       if "#doctest: +SKIP" in line:  line=line.replace('#doctest: +SKIP','')
+      if ", doctest=True)" in line:  line=line.replace(', doctest=True)',')')
       elif "doctest"       in line:  continue
       doxyFile.write(line)
     txtFile.close()

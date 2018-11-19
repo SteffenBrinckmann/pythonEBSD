@@ -89,22 +89,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0afe7ecf6de4cd8b2d4bdd7befe731b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the average orientation.  <a href="#a0afe7ecf6de4cd8b2d4bdd7befe731b9">More...</a><br/></td></tr>
 <tr class="separator:a0afe7ecf6de4cd8b2d4bdd7befe731b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">PLOTTING, PRINTING</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles</p>
-<p>Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)</p>
-<ul>
-<li>down-right: [default in text books] RD = x = down; TD = y = right; ND = z = outOfPlane</li>
-<li>up-left: [default in OIM] RD = x = up; TD = y = left; ND = z = outOfPlane</li>
-</ul>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">axis</td><td>if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles </td></tr>
-    <tr><td class="paramname">scale</td><td>scale of pole-figure dome over crystal </td></tr>
-    <tr><td class="paramname">proj2D</td><td>do a normal projection onto 2D plane: [down-right, up-left, None] </td></tr>
-  </table>
-  </dd>
-</dl>
-</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><pre class="fragment">    down    y, -x
+    up      -y, x
+    right   x,y
+    left    -x,-y
+    3D      x,y,z
+</pre> </div></td></tr>
+<tr class="memitem:a9f7b3b3da999fb85000ae054496bcf05"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#a9f7b3b3da999fb85000ae054496bcf05">project</a></td></tr>
+<tr class="separator:a9f7b3b3da999fb85000ae054496bcf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5e07e1891f616e7c9236108a939d7dc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#aa5e07e1891f616e7c9236108a939d7dc">plotLine</a></td></tr>
+<tr class="separator:aa5e07e1891f616e7c9236108a939d7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebfc9e2824c8301d65576f5c4d6fbc65"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#aebfc9e2824c8301d65576f5c4d6fbc65">plotUnit</a></td></tr>
+<tr class="memdesc:aebfc9e2824c8301d65576f5c4d6fbc65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinate see plotLine.  <a href="#aebfc9e2824c8301d65576f5c4d6fbc65">More...</a><br/></td></tr>
+<tr class="separator:aebfc9e2824c8301d65576f5c4d6fbc65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e021400d650158b55437318a2fb5dd9"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#a4e021400d650158b55437318a2fb5dd9">plot</a></td></tr>
+<tr class="memdesc:a4e021400d650158b55437318a2fb5dd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles.  <a href="#a4e021400d650158b55437318a2fb5dd9">More...</a><br/></td></tr>
 <tr class="separator:a4e021400d650158b55437318a2fb5dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5ed93f9055e70694b96a0dae6df5f42"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#aa5ed93f9055e70694b96a0dae6df5f42">toScreen</a></td></tr>
 <tr class="memdesc:aa5ed93f9055e70694b96a0dae6df5f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">print Euler angles and HKL /UVW  <a href="#aa5ed93f9055e70694b96a0dae6df5f42">More...</a><br/></td></tr>
@@ -645,7 +644,201 @@ Properties</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>show</em> = <code>True</code>&#160;</td>
+          <td class="paramname"><em>show</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ax</em> = <code>None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles. </p>
+<p>Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)</p>
+<ul>
+<li>down-right: [default in text books] RD = x = down; TD = y = right; ND = z = outOfPlane</li>
+<li>up-left: [default in OIM] RD = x = up; TD = y = left; ND = z = outOfPlane</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">axis</td><td>if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles </td></tr>
+    <tr><td class="paramname">scale</td><td>scale of pole-figure dome over crystal </td></tr>
+    <tr><td class="paramname">proj2D</td><td>do a normal projection onto 2D plane: [down-right, up-left, None] </td></tr>
+    <tr><td class="paramname">show</td><td>close figure at end </td></tr>
+    <tr><td class="paramname">ax</td><td>pyplot-axis to plot: if none: create one </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aa5e07e1891f616e7c9236108a939d7dc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def ebsd_Orientation.Orientation.plotLine </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>delta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>color</em> = <code>'k'</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>lw</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aebfc9e2824c8301d65576f5c4d6fbc65"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def ebsd_Orientation.Orientation.plotUnit </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>xlabel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ylabel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>zlabel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>x</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>y</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>z</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>s</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Coordinate see plotLine. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ax</td><td>axis to used for plotting </td></tr>
+    <tr><td class="paramname">xlabel</td><td>x-label </td></tr>
+    <tr><td class="paramname">ylabel</td><td>y-label </td></tr>
+    <tr><td class="paramname">zlabel</td><td>z-label </td></tr>
+    <tr><td class="paramname">x</td><td>x-coordinate of origin </td></tr>
+    <tr><td class="paramname">y</td><td>y-coordinate of origin </td></tr>
+    <tr><td class="paramname">z</td><td>z-coordinate of origin </td></tr>
+    <tr><td class="paramname">s</td><td>scale </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a9f7b3b3da999fb85000ae054496bcf05"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def ebsd_Orientation.Orientation.project </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -754,7 +947,7 @@ Properties</h2></td></tr>
 
 <hr class="footer"/><address class="footer"><small>
 Copyright by Steffen Brinckmann
-<!--Generated on Thu Jun 28 2018 22:15:37 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
+<!--Generated on Mon Nov 19 2018 20:47:55 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5 -->
 </small></address>

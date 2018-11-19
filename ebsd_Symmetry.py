@@ -140,18 +140,18 @@ class Symmetry:
     """Return unit cell edges
     """
     if self.lattice == 'cubic':
-      unitCell =  [[0,0,0,0,0,1],
-                   [0,0,1,0,1,1],
-                   [0,1,1,0,1,0],
-                   [0,1,0,0,0,0],
-                   [1,0,0,1,0,1],
-                   [1,0,1,1,1,1],
-                   [1,1,1,1,1,0],
-                   [1,1,0,1,0,0],
-                   [0,0,0,1,0,0],
-                   [0,0,1,1,0,1],
-                   [0,1,1,1,1,1],
-                   [0,1,0,1,1,0]]
+      unitCell =  [[0,0,0,0,0,1], #z
+                   [0,0,1,0,1,1], #y
+                   [0,1,1,0,1,0], #z
+                   [0,1,0,0,0,0], #y
+                   [1,0,0,1,0,1], #z
+                   [1,0,1,1,1,1], #y
+                   [1,1,1,1,1,0], #z
+                   [1,1,0,1,0,0], #y
+                   [0,0,0,1,0,0], #x
+                   [0,0,1,1,0,1], #x
+                   [0,1,1,1,1,1], #x
+                   [0,1,0,1,1,0]] #x
       unitCell = np.array(unitCell)-np.array([0.5,0.5,0.5,0.5,0.5,0.5])
     elif self.lattice == 'hexagonal':
       thh      = np.sqrt(3)/2
@@ -358,6 +358,7 @@ class Symmetry:
         return
       l = 2.0/ ( inPlane[0]*inPlane[0] + inPlane[1]*inPlane[1] + 1.)
       if inPlane.ndim==1:
+        print l
         hkl =np.zeros((3), dtype=np.float)
         hkl[:2]=l*inPlane
         hkl[2]=l-1.0
@@ -368,7 +369,7 @@ class Symmetry:
       return hkl
 
 
-  def standardTriangle(self, fileName=None, show=True):
+  def standardTriangle(self, fileName=None, show=True, stepSize = 0.01):
     """
     Plot standard triangle with background, discrete points in color, save to file, add text
 
@@ -379,6 +380,7 @@ class Symmetry:
     Args:
        fileName: save to file
        show: True [default] shows figure, else not
+       stepSize: plotting accuracy: lower value=better quality
     """
     from scipy.interpolate import interp1d
     if self.lattice != 'cubic':
@@ -396,7 +398,6 @@ class Symmetry:
     border = np.array(border)
     func = interp1d(yTemp,xTemp)  #function yTemp=func(xTemp)
     #create colored background
-    stepSize = 0.01
     xy, rgb = [], []
     for iY in np.arange(0,0.366025403784,stepSize):
       for iX in np.arange(iY,0.41421,stepSize):
@@ -411,10 +412,10 @@ class Symmetry:
       string = '#%02x%02x%02x' % (values[0], values[1], values[2])
       colors.append(string)
     #plotting: background, border, labels
-    plt.scatter(xy[:,0], xy[:,1], c=colors, s=150, linewidths=0)
-    plt.plot(border[:,0],border[:,1],'-k',linewidth=2)
+    plt.scatter(xy[:,0], xy[:,1], c=colors, s=15000.*stepSize, linewidths=0)#, alpha=0.05)
+    plt.plot(border[:,0],border[:,1],'-k',linewidth=3)#, alpha=0.5)
     plt.rcParams['font.size'] = 18.
-    plt.text(0,0,'[100]',horizontalalignment='right')
+    plt.text(0,0,'[100]',horizontalalignment='right')  #, zorder=40
     plt.text(0.42,0,'[110]')
     plt.text(0.37,0.37,'[111]')
     plt.axis('off')

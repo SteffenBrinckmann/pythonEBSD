@@ -25,7 +25,7 @@ class EBSD:
   ##
   # @name INPUT METHODS
   #@{
-  def __init__(self, fileName):
+  def __init__(self, fileName, doctest=False):
     """
     read input file <br>
     initialize things<br>
@@ -46,7 +46,7 @@ class EBSD:
         self.fontFile = fontFile
     self.scanUnit = "um"
     self.sym = []
-    self.doctest = False
+    self.doctest = doctest
 
     #read input file header and parse it
     self.fileName = fileName
@@ -80,7 +80,8 @@ class EBSD:
     self.image   = None
     self.mask    = self.CI > -1         #all are visible initially
     self.vMask = np.ones_like(self.x, dtype=np.bool)
-    print "   Duration init: ",int(np.round(time.time()-startTime)),"sec"
+    if not self.doctest:
+      print "   Duration init: ",int(np.round(time.time()-startTime)),"sec"
     return
 
 
@@ -679,6 +680,7 @@ class EBSD:
 
   def addSymbol(self, x, y, fileName=None, scale=1., colorCube='black'):
     """
+    TODO: use version in ebsd_Orientation
     Add symbol of crystal orientation (symmetry and rotation) to IPF at given location
 
     Args:
@@ -711,7 +713,7 @@ class EBSD:
 
     iClose      = np.argmin((self.x-x)**2 + (self.y-y)**2)
     iQuaternion = self.quaternions[iClose]
-    print "Euler angles at point:",iQuaternion.asEulers(degrees=True, round=1)
+    if not self.doctest: print "Euler angles at point:",iQuaternion.asEulers(degrees=True, round=1)
     loc         = np.array([x,y,0])
     for sym in self.sym:
       if sym.__repr__() == None: continue
@@ -749,8 +751,9 @@ class EBSD:
     buf = np.roll( buf, 3, axis = 2 )
     image = Image.fromstring( "RGBA", (w,h), buf.tostring() )
     self.image = trim(image)
-    plt.cla();     plt.clf()
+    plt.close()
     plt.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
+    if self.doctest: plt.savefig('doctest.png'); plt.close(); return
     if fileName == None:
       plt.show()
     else:

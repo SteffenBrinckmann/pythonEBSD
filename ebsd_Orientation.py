@@ -47,7 +47,10 @@ class Orientation:
     elif isinstance(quaternion, np.ndarray) and quaternion.shape == (4,):                           # based on given quaternion
       self.quaternion = Quaternion(quaternion).homomorphed()
     self.symmetry = Symmetry(symmetry)
+    self.plot2D   = "down-right"
+    self.eps = 1e-6
     self.doctest  = False
+
 
 
   def __copy__(self):
@@ -236,7 +239,76 @@ class Orientation:
   ##
   # @name PLOTTING, PRINTING
   #@{
-  def plot(self, axis=None, scale=2, proj2D=None, show=True):
+  def project(self, x,y,z):
+    """
+    down-right: y, -x
+    up-left   : -y, x
+    right-up   : x,y
+    left-down: -x,-y
+    3D        : x,y,z
+    """
+    if type(x) == list:
+      x,y,z = np.array(x),np.array(y),np.array(z)
+      if   self.plot2D=='down-right':  return  y,-x
+      elif self.plot2D=='up-left'   :  return -y, x
+      elif self.plot2D=='right-up'  :  return  x, y
+      elif self.plot2D=='left-down' :  return -x,-y
+      elif self.plot2D=='3D':          return  x, y, z
+      else:   print "Error: plot2D not well defined: plotLine"
+    else:
+      if   self.plot2D=='down-right':  return  y,-x
+      elif self.plot2D=='up-left'   :  return -y, x
+      elif self.plot2D=='right-up'  :  return  x, y
+      elif self.plot2D=='left-down' :  return -x,-y
+      elif self.plot2D=='3D':          return  x, y, z
+      else:   print "Error: plot2D not well defined: plotLine"
+    return
+
+
+  def plotLine(self, ax, start,delta,color='k',lw=1):
+    if np.linalg.norm(delta)<self.eps:
+      marker='o';  markerSize=7
+    else:
+      marker=None; markerSize=0
+    if self.plot2D=='3D':
+      ax.plot( x,y,z, color=color,lw=lw, marker=marker, markersize=markerSize)
+    else:
+      x,y = self.project([start[0]]+[start[0]+delta[0]],
+                    [start[1]]+[start[1]+delta[1]],
+                    [start[2]]+[start[2]+delta[2]])
+      ax.plot(x,y,  color=color,lw=lw, marker=marker, markersize=markerSize)
+    return
+
+
+  def plotUnit(self, ax, xlabel,ylabel,zlabel,  x=0,y=0,z=0,   s=1):  # unit axis
+    """
+    Coordinate systems: see plotLine
+
+    Args:
+       ax: axis to used for plotting
+       xlabel: x-label
+       ylabel: y-label
+       zlabel: z-label
+       x: x-coordinate of origin
+       y: y-coordinate of origin
+       z: z-coordinate of origin
+       s: scale
+    """
+    self.plotLine(ax, [x,y,z], [s,0,0], 'k',lw=3)
+    self.plotLine(ax, [x,y,z], [0,s,0], 'k',lw=3)
+    self.plotLine(ax, [x,y,z], [0,0,s], 'k',lw=3)
+    if self.plot2D=='3D':
+      ax.text(x+s,   y+0.1, z+0.1,xlabel )
+      ax.text(x+0.1, y+s,   z+0.1,ylabel )
+      ax.text(x+0.1, y+0.1, z+s  ,zlabel )
+    else:
+      ax.text(*(self.project(x+s,   y+0.1, z+0.1)+(xlabel,)) )
+      ax.text(*(self.project(x+0.1, y+s,   z+0.1)+(ylabel,)) )
+      ax.text(*(self.project(x+0.1, y+0.1, z+s  )+(zlabel,)) )
+    return
+
+
+  def plot(self, axis=None, scale=2, proj2D=None, show=True, ax=None):
     """Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles
 
     Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)
@@ -247,69 +319,40 @@ class Orientation:
        axis: if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles
        scale: scale of pole-figure dome over crystal
        proj2D: do a normal projection onto 2D plane: [down-right, up-left, None]
+       show: close figure at end
+       ax: pyplot-axis to plot: if none: create one
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
-    eps = 1e-6
-    if proj2D is not None:
-      fig, ax = plt.subplots()
-    else:
-      fig = plt.figure()
-      ax = fig.gca(projection='3d')
-      #ax.view_init(90,0)
-
-    def plotLine(start,delta,color='k',lw=1):
-      if np.linalg.norm(delta)<eps:
-        marker='o';  markerSize=7
+    if ax is None:
+      if proj2D is not None:
+        self.plot2D = proj2D
+        fig, ax = plt.subplots()
       else:
-        marker=None; markerSize=0
-      if proj2D=='down-right':
-        ax.plot( [start[1]]+[start[1]+delta[1]],
-                 [-start[0]]+[-start[0]-delta[0]],
-                 color=color,lw=lw, marker=marker, markersize=markerSize)
-      elif proj2D=='up-left':
-        ax.plot( [-start[1]]+[-start[1]-delta[1]],
-                 [start[0]]+[start[0]+delta[0]],
-                 color=color,lw=lw, marker=marker, markersize=markerSize)
-      else:
-        ax.plot( [start[0]]+[start[0]+delta[0]],
-                 [start[1]]+[start[1]+delta[1]],
-                 [start[2]]+[start[2]+delta[2]],
-                 color=color,lw=lw, marker=marker, markersize=markerSize)
+        self.plot2D = "3D"
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        #ax.view_init(90,0)
 
     for line in self.symmetry.unitCell():
       start, end = np.array(line[:3],dtype=np.float), np.array(line[3:],dtype=np.float)
       start = self.quaternion*start
       end   = self.quaternion*end
       if start[2]<0 and end[2]<0:
-        plotLine(start, end-start,color="b",lw=0.2)
+        self.plotLine(ax, start, end-start,color="b",lw=0.2)
       elif start[2]>0 and end[2]>0:
-        plotLine(start, end-start,color="b",lw=2)
+        self.plotLine(ax, start, end-start,color="b",lw=2)
       else:
         delta = end-start
         k     = -start[2]/delta[2]
         mid   = start+k*delta
         if start[2]>0:
-          plotLine(start, mid-start,color="b",lw=2)
-          plotLine(mid,   end-mid,color="b",lw=0.2)
+          self.plotLine(ax, start, mid-start,color="b",lw=2)
+          self.plotLine(ax, mid,   end-mid,color="b",lw=0.2)
         else:
-          plotLine(start, mid-start,color="b",lw=0.2)
-          plotLine(mid,   end-mid,color="b",lw=2)
-    plotLine([0,0,0], [1,0,0], 'k',lw=3)
-    plotLine([0,0,0], [0,1,0], 'k',lw=3)
-    plotLine([0,0,0], [0,0,1], 'k',lw=3)
-    if proj2D=='down-right':
-      ax.text(0.1,-1,"RD [100]")
-      ax.text(1,-0.1,"TD [010]")
-      ax.text(0.1,-0.1,"ND [001]")
-    elif proj2D=='up-left':
-      ax.text(-0.1,1,"RD [100]")
-      ax.text(-1,0.1,"TD [010]")
-      ax.text(-0.1,0.1,"ND [001]")
-    else:
-      ax.text(1,0.1,0.1,"RD [100]")
-      ax.text(0.1,1,0.1,"TD [010]")
-      ax.text(0.1,0.1,1,"ND [001]")
+          self.plotLine(ax, start, mid-start,color="b",lw=0.2)
+          self.plotLine(ax, mid,   end-mid,color="b",lw=2)
+    self.plotUnit(ax, "RD [100]","TD [010]","ND [001]")
 
     if axis is not None:
       #plot sphere
@@ -329,13 +372,13 @@ class Orientation:
       for q in oHelp.symmetry.equivalentQuaternions(oHelp.quaternion):
         conjAxis      = q*axis
         direction = self.quaternion*conjAxis
-        if direction[2]<-eps: continue                                                        #prevent rounding errors
+        if direction[2]<-self.eps: continue                                                        #prevent rounding errors
         fromBase = direction+np.array([0,0,1])
-        plotLine([0,0,0], direction*scale, color='b', lw=1)
-        plotLine(-scale*np.array([0,0,1]), (fromBase)*scale, 'skyblue')
+        self.plotLine(ax, [0,0,0], direction*scale, color='b', lw=1)
+        self.plotLine(ax, -scale*np.array([0,0,1]), (fromBase)*scale, 'skyblue')
         xy  = fromBase/fromBase[2]*scale
         xy[2]=0.0
-        plotLine( xy, [0.,0.,0.], color='skyblue')
+        self.plotLine(ax, xy, [0.,0.,0.], color='skyblue')
     ax.axis('equal'), ax.axis('off')
     ax.set_xlabel(''); ax.set_xticks([])
     ax.set_ylabel(''); ax.set_yticks([])

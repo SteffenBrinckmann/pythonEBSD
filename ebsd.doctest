@@ -27,43 +27,41 @@ Features:
 >>> import Image                           #doctest omit line in doxy
 >>> import numpy as np                     #doctest omit line in doxy
 >>> from ebsd import EBSD
->>> e = EBSD("Examples/EBSD.ang")
+>>> e = EBSD("Examples/EBSD.ang", doctest=True)
 Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
->>> e.doctest=True
 >>> e.plot(e.CI)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 435633376
+doctest 434720908
 >>> e.maskCI( 0.1 )
 >>> e.plot( e.CI )
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 429497716
+doctest 428678014
 >>> e.plotIPF()
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 446435030
+doctest 445989359
 >>> e.plotIPF(1024)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 446366814
+doctest 445921143
 >>> e.addScaleBar()
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 214254191
 >>> e.setVMask(4)                          # use only every 4th point, increases plotting speed
 >>> e.plotIPF(1024)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 446380620
+doctest 445934949
 >>> e.cropVMask(0,0,10,10)               # show only a section of the image, increases plotting speed
 >>> e.plotIPF(1024)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 432026847
+doctest 431760975
 >>> e.plotPF([1,0,0])
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 485770305
 >>> e.plotPF([1,0,0],points=True)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 487223361
+doctest 485158752
 
 \endverbatim
 
@@ -75,7 +73,7 @@ How to export txt-file from OIM that can be read:
   - Partition->export-> grain file -> use "grain file type 1" (saves a txt file)
   - Partition->export-> partition data -> save as .ang
 
-Warning: This is example input file does not exist, anymore
+Warning: This is example input file does not exist, anymore. Not tested
 \verbatim
 > e = EBSD("Examples/Test.ang")
 > e.loadTXT("Examples/TestB.txt")
@@ -93,12 +91,11 @@ Which can then be read in OIM again
 >>> import numpy as np
 >>> from ebsd import EBSD
 >>> from ebsd_Orientation import Orientation
->>> e = EBSD("Examples/EBSD.ang")
+>>> e = EBSD("Examples/EBSD.ang", doctest=True)
 Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
 >>> e.maskCI( 0.001 )
 >>> e.plotIPF('ND')                        #doctest: +SKIP
 >>> e.cropVMask(xmin=18,ymin=12,ymax=17)
@@ -156,39 +153,35 @@ Equivalent orientations - Euler angles:
    [263.2   51.0  222.2]
 >>> o.plot(proj2D='up-left')
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 485619933
+doctest 485188540
 >>> o.plot(axis=[1,0,0],proj2D='up-left',scale=1.5)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 485534411
+doctest 484312323
 
 \endverbatim
 Create artificial ebsd pattern to check PF
 \verbatim
->>> e = EBSD('void318.|125.|219.6|0|2')
+>>> e = EBSD('void318.|125.|219.6|0|2', doctest=True)
 Void mode 318.|125.|219.6|0|2
    Euler angles: 5.55 2.18 3.83 | distribution: 0.0 | numberPerAxis: 2.0
    Read file with step size: 1.0 1.0
    Optimal image pixel size: 1
    Number of points: 4
-   Duration init:  0 sec
->>> e.doctest = True
 >>> e.plotPF(size=5)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 485115848
 >>> e.plotPF(points=True)
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 487487736
+doctest 485423127
 
 \endverbatim
 Finally, inspect pole-figure of data and compare OIM software, mTex and this python code
 \verbatim
->>> e = EBSD("Examples/EBSD.ang")
+>>> e = EBSD("Examples/EBSD.ang", doctest=True)
 Load .ang file:  Examples/EBSD.ang
    Read file with step size: 0.2 0.2
    Optimal image pixel size: 103
    Number of points: 23909
-   Duration init:  0 sec
->>> e.doctest = True
 >>> e.maskCI( 0.001 )
 >>> e.plotPF(size=1)                       #doctest: +SKIP
 >>> e.plotPF()                 #doctest: +SKIP
@@ -236,6 +229,28 @@ Issues from mTex:
 </ul>
 \endhtmlonly
 
+
+\subsection example4 Average orientation in file, does not make sence for this multi-grain case
+averaging takes lots of time: Orientation.average()
+\verbatim
+>>> from ebsd_Orientation import Orientation
+>>> from ebsd import EBSD
+>>> Orients = []
+>>> e = EBSD("Examples/EBSD.ang", doctest=True)
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> for i in range(len(e.x)):
+...   Orients.append(Orientation(quaternion=e.quaternions[i], symmetry="cubic"))
+>>> avg = Orientation.average( Orients)
+>>> print "Average orientation",np.round(avg.asEulers(degrees=True, standardRange=True),2)
+Average orientation [  79.12    9.81  281.32]
+
+\endverbatim
+
+
+
 \subsection compare Compare the three software for bicrystal
 \htmlonly
 <table border=1>
@@ -255,24 +270,39 @@ Issues from mTex:
   <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
   <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
   <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+</table>
 \endhtmlonly
 
 Python code
 \verbatim
-e = EBSD("Examples/EBSD.ang")
-e.cropVMask(ymin=35)
-e.plotIPF("ND",fileName="pythonND.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonND.png")
-e.plotIPF("RD",fileName="pythonRD.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
-e.plotIPF("TD",fileName="pythonTD.png")
-e.addSymbol(5,37, scale=2)
-e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
-e.plotPF(      fileName="pythonPF.png")
-\endverbatim
+>>> import Image                           #doctest omit line in doxy
+>>> import numpy as np                     #doctest omit line in doxy
+>>> from ebsd import EBSD
+>>> e = EBSD("Examples/EBSD.ang", doctest=True)
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> e.cropVMask(ymin=35)
+>>> e.plotIPF("ND",fileName="pythonND.png")
+>>> e.addSymbol(5,37, scale=2)
+>>> e.addSymbol(18,37, scale=2,fileName="pythonND.png")
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 463105155
+>>> e.plotIPF("RD",fileName="pythonRD.png")
+>>> e.addSymbol(5,37, scale=2)
+>>> e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 469486082
+>>> e.plotIPF("TD",fileName="pythonTD.png")
+>>> e.addSymbol(5,37, scale=2)
+>>> e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 479052133
+>>> e.plotPF(      fileName="pythonPF.png")
 
+\endverbatim
+please, note, the last image is not colored. This is not implemented yet. TODO
 
 \section mTex how to run mTex
 \verbatim
