@@ -23,7 +23,7 @@ corresponding pole-figure
 ![Pole figure](HTMLInput/ebsd_py_PF100.png)
 
 
-# Documentation
+# Documentation (some links broken on github)
 [Documentation on github pages](https://steffenbrinckmann.github.io/pythonEBSD/index.html)
 
 # What features I do not envision:
@@ -47,7 +47,7 @@ Clone data from github
 git clone https://github.com/SteffenBrinckmann/pythonEBSD.git
 ```
 
-Build documentation and tutorials
+Build documentation and tutorials (should work perfectly)
 ```bash
 python verifyAll.py
 ```
