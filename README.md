@@ -11,6 +11,7 @@ I look for more contributors, see below
     - can be removed just before final plotting
   - verified with the OIM software and mTex
   - heavily tested for cubic
+  - separate crystal orientation and plotting of it
   - some educational plotting
   - examples and lots of docummentation via Doxygen
   - doctest verifies functionality
@@ -23,7 +24,7 @@ corresponding pole-figure
 ![Pole figure](docs/HTMLInput/ebsd_py_PF100.png)
 
 
-# Documentation (some links broken on github)
+# Documentation
 [Documentation on github pages](https://steffenbrinckmann.github.io/pythonEBSD/index.html)
 
 # What features I do not envision:
@@ -47,8 +48,8 @@ Clone data from github
 git clone https://github.com/SteffenBrinckmann/pythonEBSD.git
 ```
 
-Build documentation and tutorials (should work perfectly)
+Build documentation and tutorials
 ```bash
 python verifyAll.py
 ```
-then open HTML/index.html in webbrowser
+then open docs/index.html in webbrowser

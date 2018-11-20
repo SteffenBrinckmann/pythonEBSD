@@ -284,9 +284,9 @@ Load .ang file:  Examples/EBSD.ang
    Optimal image pixel size: 103
    Number of points: 23909
 >>> e.cropVMask(ymin=35)
->>> e.plotIPF("ND",fileName="pythonND.png")
+>>> e.plotIPF("ND",fileName="doctest.png")
 >>> e.addSymbol(5,37, scale=2)
->>> e.addSymbol(18,37, scale=2,fileName="pythonND.png")
+>>> e.addSymbol(18,37, scale=2,fileName="doctest.png")
 >>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
 doctest 463105155
 >>> e.plotIPF("RD",fileName="pythonRD.png")

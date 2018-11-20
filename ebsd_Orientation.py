@@ -339,7 +339,7 @@ class Orientation:
        annotate: annotate poles in pole figure (requires poles given)
        plot2D: do a normal projection onto 2D plane: [down-right, up-left, None]
        scale: scale of pole-figure dome over crystal
-       show: close figure at end
+       fileName: fileName for image output (if given, image not shown)
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
