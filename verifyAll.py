@@ -30,7 +30,12 @@ if os.path.exists('doctest.png'):
 #commit to github
 if noFailure:
   message = raw_input("Enter github message? [empty: no commit] ")
-  if len(message)>3:
-    os.system("git add -A")
-    os.system('git commit -m "'+message+'"')
-    os.system('git push -u origin master')
+  gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\nBackupEBSD\n"
+  gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\nBackupEBSD\n"
+  with open(".gitignore", "w") as fout:
+    fout.write(gitignoreRemote)
+  os.system("git add -A")
+  os.system('git commit -m "'+message+'"')
+  os.system('git push -u origin master')
+  with open(".gitignore", "w") as fout:
+    fout.write(gitignoreLocal)
