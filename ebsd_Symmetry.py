@@ -13,17 +13,6 @@ from ebsd_Quaternion import Quaternion
 
 ##
 #  Material symmetry class; this class only stores lattice: cubic, hexagonal
-############################## <HR>
-#
-#
-### Example:
-# ------------------------------
-#\verbatim
-#from ebsd_Symmetry import Symmetry
-#s = Symmetry('cubic')
-#s.inSST( [0.5,0.5,-0.7071], color=True)
-#\endverbatim
-#
 class Symmetry:
 
   lattices = [None,'orthorhombic','tetragonal','hexagonal','cubic',]

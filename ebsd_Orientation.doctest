@@ -36,6 +36,8 @@ array([ 0.  ,  0.09,  1.  ])
 and verify
 \image html ebsd_Orientation1.png
 \verbatim
+>>> import Image                           #doctest omit line in doxy
+>>> import numpy as np                     #doctest omit line in doxy
 >>> hkl = np.array([1,1,1], dtype=np.float)
 >>> uvw1 = np.array([1,-1,0], dtype=np.float)
 >>> np.dot(hkl,uvw1)
@@ -49,8 +51,13 @@ array([[ 0.70710678, -0.70710678,  0.        ],
        [ 0.40824829,  0.40824829, -0.81649658],
        [ 0.57735027,  0.57735027,  0.57735027]])
 >>> o = Orientation(matrix=rotM, symmetry='cubic')
->>> o.plot()                                           #doctest: +SKIP
->>> o.plot([1,0,0])                                    #doctest: +SKIP
+>>> o.doctest = True
+>>> o.plot()
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 486813521
+>>> o.plot([1,0,0])
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 485606048
 >>> o.asEulers(degrees=True)
 array([  0.        ,  54.73561032,  45.        ])
 >>> np.round(o.IPFcolor( [0,0,1] ),3)                  #should be blue
@@ -62,10 +69,19 @@ array([ 0.,  0.,  1.])
 OIM software shows the 2D projection with the RD upward. Note, many textbooks have the RD downward. ND is always pointing out of the plane; TD changes depending on RD
 \verbatim
 >>> o = Orientation(Eulers=np.radians([0,10,10]), symmetry="cubic")
->>> o.plot( )                                          #doctest: +SKIP
->>> o.plot(proj2D='up-left')                              #doctest: +SKIP
->>> o.plot(axis=[1,0,0], proj2D='up-left', scale=1.5)     #doctest: +SKIP
->>> o.plot(axis=[1,1,1])                               #doctest: +SKIP
+>>> o.doctest = True
+>>> o.plot( )
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 486784407
+>>> o.plot(plot2D='up-left')
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 486728369
+>>> o.plot(poles=[1,0,0], plot2D='up-left', scale=1.5)
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 485058635
+>>> o.plot(poles=[1,1,1])
+>>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
+doctest 485475338
 >>> o.toScreen(equivalent=False)
 Euler angles: [  0.  10.  10.]
 HKL [ 1  5 32]

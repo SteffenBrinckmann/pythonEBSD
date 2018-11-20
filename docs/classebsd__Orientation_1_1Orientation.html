@@ -98,6 +98,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9f7b3b3da999fb85000ae054496bcf05"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#a9f7b3b3da999fb85000ae054496bcf05">project</a></td></tr>
 <tr class="separator:a9f7b3b3da999fb85000ae054496bcf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5e07e1891f616e7c9236108a939d7dc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#aa5e07e1891f616e7c9236108a939d7dc">plotLine</a></td></tr>
+<tr class="memdesc:aa5e07e1891f616e7c9236108a939d7dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot one line using given projection.  <a href="#aa5e07e1891f616e7c9236108a939d7dc">More...</a><br/></td></tr>
 <tr class="separator:aa5e07e1891f616e7c9236108a939d7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebfc9e2824c8301d65576f5c4d6fbc65"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classebsd__Orientation_1_1Orientation.html#aebfc9e2824c8301d65576f5c4d6fbc65">plotUnit</a></td></tr>
 <tr class="memdesc:aebfc9e2824c8301d65576f5c4d6fbc65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinate see plotLine.  <a href="#aebfc9e2824c8301d65576f5c4d6fbc65">More...</a><br/></td></tr>
@@ -626,7 +627,31 @@ Properties</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>axis</em> = <code>None</code>, </td>
+          <td class="paramname"><em>poles</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>unitCell</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>cos</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>annotate</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>plot2D</em> = <code>None</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -638,19 +663,7 @@ Properties</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>proj2D</em> = <code>None</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>show</em> = <code>True</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>ax</em> = <code>None</code>&#160;</td>
+          <td class="paramname"><em>fileName</em> = <code>None</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -668,11 +681,13 @@ Properties</h2></td></tr>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">axis</td><td>if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles </td></tr>
+    <tr><td class="paramname">poles</td><td>if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles </td></tr>
+    <tr><td class="paramname">unitCell</td><td>plot unit cell </td></tr>
+    <tr><td class="paramname">cos</td><td>plot coordinate system </td></tr>
+    <tr><td class="paramname">annotate</td><td>annotate poles in pole figure (requires poles given) </td></tr>
+    <tr><td class="paramname">plot2D</td><td>do a normal projection onto 2D plane: [down-right, up-left, None] </td></tr>
     <tr><td class="paramname">scale</td><td>scale of pole-figure dome over crystal </td></tr>
-    <tr><td class="paramname">proj2D</td><td>do a normal projection onto 2D plane: [down-right, up-left, None] </td></tr>
     <tr><td class="paramname">show</td><td>close figure at end </td></tr>
-    <tr><td class="paramname">ax</td><td>pyplot-axis to plot: if none: create one </td></tr>
   </table>
   </dd>
 </dl>
@@ -717,7 +732,13 @@ Properties</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>lw</em> = <code>1</code>&#160;</td>
+          <td class="paramname"><em>lw</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>markerSize</em> = <code>None</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -726,6 +747,19 @@ Properties</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Plot one line using given projection. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ax</td><td>axis to plot into </td></tr>
+    <tr><td class="paramname">start</td><td>start coordinate </td></tr>
+    <tr><td class="paramname">delta</td><td>delta cooradinate (end-start) </td></tr>
+    <tr><td class="paramname">color</td><td>color </td></tr>
+    <tr><td class="paramname">lw</td><td>line width </td></tr>
+    <tr><td class="paramname">markerSize</td><td>size of marker (only used for non-lines: delta&gt;0) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -947,7 +981,7 @@ Properties</h2></td></tr>
 
 <hr class="footer"/><address class="footer"><small>
 Copyright by Steffen Brinckmann
-<!--Generated on Mon Nov 19 2018 21:01:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
+<!--Generated on Tue Nov 20 2018 15:59:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5 -->
 </small></address>

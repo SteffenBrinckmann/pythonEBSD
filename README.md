@@ -17,10 +17,10 @@ I look for more contributors, see below
 
 
 EBSD-Inverse Pole Figure (IPF) of polycrystalline Copper
-![EBSD of polycrystalline Copper](HTMLInput/ebsd_py_ND.png)
+![EBSD of polycrystalline Copper](docs/HTMLInput/ebsd_py_ND.png)
 
 corresponding pole-figure
-![Pole figure](HTMLInput/ebsd_py_PF100.png)
+![Pole figure](docs/HTMLInput/ebsd_py_PF100.png)
 
 
 # Documentation (some links broken on github)

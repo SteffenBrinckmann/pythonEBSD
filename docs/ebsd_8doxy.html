@@ -161,8 +161,8 @@ Equivalent orientations - Euler angles:
    [203.0  121.5  137.6]
    [ 83.2  129.0  317.8]
    [263.2   51.0  222.2]
-&gt;&gt;&gt; o.plot(proj2D='up-left')
-&gt;&gt;&gt; o.plot(axis=[1,0,0],proj2D='up-left',scale=1.5)</pre><p> Create artificial ebsd pattern to check PF </p>
+&gt;&gt;&gt; o.plot(plot2D='up-left')
+&gt;&gt;&gt; o.plot(poles=[1,0,0],plot2D='up-left',scale=1.5)</pre><p> Create artificial ebsd pattern to check PF </p>
 <pre class="fragment">&gt;&gt;&gt; e = EBSD('void318.|125.|219.6|0|2')
 Void mode 318.|125.|219.6|0|2
    Euler angles: 5.55 2.18 3.83 | distribution: 0.0 | numberPerAxis: 2.0
@@ -186,35 +186,35 @@ Load .ang file:  Examples/EBSD.ang
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_ND.bmp"    height=300px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px></td>
-  <td><image src="../HTMLInput/ebsd_py_ND.png"     height=300px></td></tr>
+  <td><image src="HTMLInput/ebsd_OIM_ND.bmp"    height=300px></td>
+  <td><image src="HTMLInput/ebsd_mTex_ND.png"   height=300px></td>
+  <td><image src="HTMLInput/ebsd_py_ND.png"     height=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_RD.bmp"    height=300px></td>
+  <td><image src="HTMLInput/ebsd_OIM_RD.bmp"    height=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/ebsd_py_RD.png"     height=300px></td></tr>
+  <td><image src="HTMLInput/ebsd_py_RD.png"     height=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_PF001.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF100.png"     height=200px></td></tr>
+  <td><image src="HTMLInput/ebsd_OIM_PF001.bmp"    height=200px></td>
+  <td><image src="HTMLInput/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInput/ebsd_py_PF100.png"     height=200px></td></tr>
 <tr><td><center>PF [100] contour</center> </td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF100Contour.png"     height=200px></td></tr>
+  <td><image src="HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInput/ebsd_py_PF100Contour.png"     height=200px></td></tr>
 <tr><td><center>PF [111]</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_PF111.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF111.png"     height=200px></td></tr>
+  <td><image src="HTMLInput/ebsd_OIM_PF111.bmp"    height=200px></td>
+  <td><image src="HTMLInput/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInput/ebsd_py_PF111.png"     height=200px></td></tr>
 </table>
 
 Issues from mTex:
 <ul>
 <li>.bmp (left): low color number when exporting from external window. .png works (right)<br>
-<image src="../HTMLInput/ebsd_mTex_ND.bmp"   height=300px>
-<image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px>
+<image src="HTMLInput/ebsd_mTex_ND.bmp"   height=300px>
+<image src="HTMLInput/ebsd_mTex_ND.png"   height=300px>
 <li>Explicitly select x-axis as North and z-axis as outOfPlane; normal orientation has different result, although it should be the same<br>
-<image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
-<image src="../HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
+<image src="HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
+<image src="HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
 </ul>
 <h2><a class="anchor" id="example4"></a>
 Average orientation in file, does not make sence for this multi-grain case</h2>
@@ -240,17 +240,17 @@ Compare the three software for bicrystal</h2>
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
-  <td><image src="../HTMLInput/bc_mTex_ND.png"   width=300px></td>
-  <td><image src="../HTMLInput/bc_py_ND.png"     width=300px></td></tr>
+  <td><image src="HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
+  <td><image src="HTMLInput/bc_mTex_ND.png"   width=300px></td>
+  <td><image src="HTMLInput/bc_py_ND.png"     width=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
+  <td><image src="HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/bc_py_RD.png"     width=300px></td></tr>
+  <td><image src="HTMLInput/bc_py_RD.png"     width=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
-  <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+  <td><image src="HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
+  <td><image src="HTMLInput/bc_mTex_PF.png"   height=200px></td>
+  <td><image src="HTMLInput/bc_py_PF.png"     height=200px></td></tr>
 </table>
 <p>Python code </p>
 <pre class="fragment">&gt;&gt;&gt; from ebsd import EBSD
@@ -326,7 +326,7 @@ Hints for developers</h1>
 
 <hr class="footer"/><address class="footer"><small>
 Copyright by Steffen Brinckmann
-<!--Generated on Mon Nov 19 2018 21:01:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
+<!--Generated on Tue Nov 20 2018 15:59:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5 -->
 </small></address>

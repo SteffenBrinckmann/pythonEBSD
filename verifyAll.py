@@ -3,10 +3,13 @@
 import doctest
 import os
 
+noFailure = True
 for fileName in os.listdir("."):
   if fileName.endswith(".doctest"):
     result = doctest.testfile(fileName)
     print "%-30s %-30s"%(fileName,result,)
+    if result.failed>0:
+      noFailure = False
     txtFile = open(fileName,'r')
     doxyFile= open(fileName[:-7]+"doxy",'w')
     for line in txtFile:
@@ -25,14 +28,9 @@ if os.path.exists('doctest.png'):
   os.unlink('doctest.png')
 
 #commit to github
-message = raw_input("Enter github message? [empty: no commit] ")
-if len(message)>3:
-  gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\nHTMLInput/\nBackupEBSD\n"
-  gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\nHTMLInput/\nBackupEBSD\n"
-  with open(".gitignore", "w") as fout:
-    fout.write(gitignoreRemote)
-  os.system("git add -A")
-  os.system('git commit -m "'+message+'"')
-  os.system('git push -u origin master')
-  with open(".gitignore", "w") as fout:
-    fout.write(gitignoreLocal)
+if noFailure:
+  message = raw_input("Enter github message? [empty: no commit] ")
+  if len(message)>3:
+    os.system("git add -A")
+    os.system('git commit -m "'+message+'"')
+    os.system('git push -u origin master')

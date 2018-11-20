@@ -87,8 +87,8 @@ array([[ 0.70710678, -0.70710678,  0.        ],
        [ 0.40824829,  0.40824829, -0.81649658],
        [ 0.57735027,  0.57735027,  0.57735027]])
 &gt;&gt;&gt; o = Orientation(matrix=rotM, symmetry='cubic')
-&gt;&gt;&gt; o.plot()                                           
-&gt;&gt;&gt; o.plot([1,0,0])                                    
+&gt;&gt;&gt; o.plot()
+&gt;&gt;&gt; o.plot([1,0,0])
 &gt;&gt;&gt; o.asEulers(degrees=True)
 array([  0.        ,  54.73561032,  45.        ])
 &gt;&gt;&gt; np.round(o.IPFcolor( [0,0,1] ),3)                  #should be blue
@@ -96,10 +96,10 @@ array([ 0.,  0.,  1.])</pre><h2><a class="anchor" id="example1b"></a>
 Compare to OIM Software</h2>
 <p>OIM software shows the 2D projection with the RD upward. Note, many textbooks have the RD downward. ND is always pointing out of the plane; TD changes depending on RD </p>
 <pre class="fragment">&gt;&gt;&gt; o = Orientation(Eulers=np.radians([0,10,10]), symmetry="cubic")
-&gt;&gt;&gt; o.plot( )                                          
-&gt;&gt;&gt; o.plot(proj2D='up-left')                              
-&gt;&gt;&gt; o.plot(axis=[1,0,0], proj2D='up-left', scale=1.5)     
-&gt;&gt;&gt; o.plot(axis=[1,1,1])                               
+&gt;&gt;&gt; o.plot( )
+&gt;&gt;&gt; o.plot(plot2D='up-left')
+&gt;&gt;&gt; o.plot(poles=[1,0,0], plot2D='up-left', scale=1.5)
+&gt;&gt;&gt; o.plot(poles=[1,1,1])
 &gt;&gt;&gt; o.toScreen(equivalent=False)
 Euler angles: [  0.  10.  10.]
 HKL [ 1  5 32]
@@ -148,7 +148,7 @@ Python source code documentation</h1>
 
 <hr class="footer"/><address class="footer"><small>
 Copyright by Steffen Brinckmann
-<!--Generated on Mon Nov 19 2018 21:01:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
+<!--Generated on Tue Nov 20 2018 15:59:19 for EBSDpython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5 -->
 </small></address>

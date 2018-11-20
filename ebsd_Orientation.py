@@ -241,6 +241,7 @@ class Orientation:
   #@{
   def project(self, x,y,z):
     """
+
     down-right: y, -x
     up-left   : -y, x
     right-up   : x,y
@@ -265,13 +266,29 @@ class Orientation:
     return
 
 
-  def plotLine(self, ax, start,delta,color='k',lw=1):
+  def plotLine(self, ax, start,delta,color='k',lw=1, markerSize=None):
+    """
+    Plot one line using given projection
+
+    Args:
+       ax: axis to plot into
+       start: start coordinate
+       delta: delta cooradinate (end-start)
+       color: color
+       lw: line width
+       markerSize: size of marker (only used for non-lines: delta>0)
+    """
     if np.linalg.norm(delta)<self.eps:
-      marker='o';  markerSize=7
+      marker='o'
+      if markerSize is None:
+        markerSize=7
     else:
       marker=None; markerSize=0
     if self.plot2D=='3D':
-      ax.plot( x,y,z, color=color,lw=lw, marker=marker, markersize=markerSize)
+      ax.plot( [start[0]]+[start[0]+delta[0]],
+               [start[1]]+[start[1]+delta[1]],
+               [start[2]]+[start[2]+delta[2]],
+               color=color,lw=lw, marker=marker, markersize=markerSize)
     else:
       x,y = self.project([start[0]]+[start[0]+delta[0]],
                     [start[1]]+[start[1]+delta[1]],
@@ -308,7 +325,7 @@ class Orientation:
     return
 
 
-  def plot(self, axis=None, scale=2, proj2D=None, show=True, ax=None):
+  def plot(self, poles=None, unitCell=True, cos=True, annotate=False, plot2D=None, scale=2, fileName=None):
     """Plot rotated unit-cell in 3D, and possibly the pole-figure and specific poles
 
     Projection onto 2D: cooradinate systems are given as xDirection-yDirection (z follows)
@@ -316,75 +333,89 @@ class Orientation:
     - up-left: [default in OIM] RD = x = up; TD = y = left; ND = z = outOfPlane
 
     Args:
-       axis: if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles
+       poles: if given (e.g. [1,0,0]), plot pole-figure and the corresponding poles
+       unitCell: plot unit cell
+       cos: plot coordinate system
+       annotate: annotate poles in pole figure (requires poles given)
+       plot2D: do a normal projection onto 2D plane: [down-right, up-left, None]
        scale: scale of pole-figure dome over crystal
-       proj2D: do a normal projection onto 2D plane: [down-right, up-left, None]
        show: close figure at end
-       ax: pyplot-axis to plot: if none: create one
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
-    if ax is None:
-      if proj2D is not None:
-        self.plot2D = proj2D
-        fig, ax = plt.subplots()
-      else:
-        self.plot2D = "3D"
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')
-        #ax.view_init(90,0)
+    if plot2D is not None:
+      self.plot2D = plot2D
+    if self.plot2D == "3D":
+      fig = plt.figure()
+      ax = fig.gca(projection='3d')
+      #ax.view_init(90,0)
+    else:
+      fig, ax = plt.subplots()
 
-    for line in self.symmetry.unitCell():
-      start, end = np.array(line[:3],dtype=np.float), np.array(line[3:],dtype=np.float)
-      start = self.quaternion*start
-      end   = self.quaternion*end
-      if start[2]<0 and end[2]<0:
-        self.plotLine(ax, start, end-start,color="b",lw=0.2)
-      elif start[2]>0 and end[2]>0:
-        self.plotLine(ax, start, end-start,color="b",lw=2)
-      else:
-        delta = end-start
-        k     = -start[2]/delta[2]
-        mid   = start+k*delta
-        if start[2]>0:
-          self.plotLine(ax, start, mid-start,color="b",lw=2)
-          self.plotLine(ax, mid,   end-mid,color="b",lw=0.2)
+    if unitCell:
+      for line in self.symmetry.unitCell():
+        start, end = np.array(line[:3],dtype=np.float), np.array(line[3:],dtype=np.float)
+        start = self.quaternion*start
+        end   = self.quaternion*end
+        if start[2]<0 and end[2]<0:
+          self.plotLine(ax, start, end-start,color="b",lw=0.2)
+        elif start[2]>0 and end[2]>0:
+          self.plotLine(ax, start, end-start,color="b",lw=2)
         else:
-          self.plotLine(ax, start, mid-start,color="b",lw=0.2)
-          self.plotLine(ax, mid,   end-mid,color="b",lw=2)
-    self.plotUnit(ax, "RD [100]","TD [010]","ND [001]")
+          delta = end-start
+          k     = -start[2]/delta[2]
+          mid   = start+k*delta
+          if start[2]>0:
+            self.plotLine(ax, start, mid-start,color="b",lw=2)
+            self.plotLine(ax, mid,   end-mid,color="b",lw=0.2)
+          else:
+            self.plotLine(ax, start, mid-start,color="b",lw=0.2)
+            self.plotLine(ax, mid,   end-mid,color="b",lw=2)
 
-    if axis is not None:
+    if cos: self.plotUnit(ax, "RD [100]","TD [010]","ND [001]")
+
+    if poles is not None:
       #plot sphere
-      u = np.linspace(0,2*np.pi,50)
-      v = np.linspace(0,np.pi/2,50)
-      x = scale*np.outer(np.cos(u)      , np.sin(v))
-      y = scale*np.outer(np.sin(u)      , np.sin(v))
-      z = scale*np.outer(np.ones_like(u), np.cos(v))
-      if proj2D is None:
+      if self.plot2D=="3D":
+        u = np.linspace(0,2*np.pi,50)
+        v = np.linspace(0,np.pi/2,50)
+        x = scale*np.outer(np.cos(u)      , np.sin(v))
+        y = scale*np.outer(np.sin(u)      , np.sin(v))
+        z = scale*np.outer(np.ones_like(u), np.cos(v))
         ax.plot_surface(x, y, z, color='gray',alpha=0.7, cstride=10, rstride=10, lw=0)
       else:
         ax.plot( scale*np.cos(np.linspace(0.,2.*np.pi,100)), scale*np.sin(np.linspace(0.,2.*np.pi,100)), 'k--' )
       # plot poles
       oHelp = Orientation(Eulers=np.array([0.,0.,0.]), symmetry=self.symmetry.__repr__())
-      axis = np.array(axis, dtype=np.float)
-      axis /= np.linalg.norm(axis)
-      for q in oHelp.symmetry.equivalentQuaternions(oHelp.quaternion):
-        conjAxis      = q*axis
+      poles = np.array(poles, dtype=np.float)
+      poles /= np.linalg.norm(poles)
+      for idx,q in enumerate(oHelp.symmetry.equivalentQuaternions(oHelp.quaternion)):
+        conjAxis      = q*poles  #e.g. [100]
         direction = self.quaternion*conjAxis
         if direction[2]<-self.eps: continue                                                        #prevent rounding errors
         fromBase = direction+np.array([0,0,1])
-        self.plotLine(ax, [0,0,0], direction*scale, color='b', lw=1)
-        self.plotLine(ax, -scale*np.array([0,0,1]), (fromBase)*scale, 'skyblue')
+        #self.plotLine(ax, [0,0,0], direction*scale, color='c', lw=1) #in plane lines: not needed
+        if self.plot2D=="3D":
+          self.plotLine(ax, -scale*np.array([0,0,1]), (fromBase)*scale, 'c')  #lines from bottom base to points
         xy  = fromBase/fromBase[2]*scale
         xy[2]=0.0
-        self.plotLine(ax, xy, [0.,0.,0.], color='skyblue')
-    ax.axis('equal'), ax.axis('off')
-    ax.set_xlabel(''); ax.set_xticks([])
-    ax.set_ylabel(''); ax.set_yticks([])
-    if not proj2D:   ax.set_zlabel(''); ax.set_zticks([])
+        self.plotLine(ax, xy, [0.,0.,0.], color='c')  #plot point
+        if annotate:
+          x_,y_ = self.project(xy[0],xy[1],xy[2])
+          label_ = str(np.array(conjAxis,dtype=np.int))[1:-1]
+          label_ = label_.replace(" ","")
+          ax.text(x_+0.05,y_+0.05, label_)
+
+    #finalize plot
+    ax.axis('equal'); ax.axis('off')
+    ax.set_xlim([-scale*1.1,scale*1.1])
+    ax.set_ylim([-scale*1.1,scale*1.1])
+    if self.plot2D=="3D":
+      ax.set_zlabel(''); ax.set_zticks([])
     if self.doctest: plt.savefig('doctest.png'); plt.close(); return
-    if show is True:
+    if fileName is not None:
+      plt.savefig(fileName, dpi=150, bbox_inches='tight')
+    else:
       plt.show()
     return
 
