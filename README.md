@@ -17,7 +17,7 @@ I look for more contributors, see below
   - doctest verifies functionality
   - introduce Kernel average misorientation
 
-  
+
 EBSD-Inverse Pole Figure (IPF) of polycrystalline Copper
 ![EBSD of polycrystalline Copper](HTMLInput/ebsd_py_ND.png)
 
@@ -26,7 +26,7 @@ corresponding pole-figure
 
 
 # Documentation
-[Documentation on github pages](docs/index.html)
+[Documentation on github pages](https://steffenbrinckmann.github.io/pythonEBSD/index.html)
 
 # What features I do not envision:
   - include all crystal symmetries (materials science can mostly live with few)
