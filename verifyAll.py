@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-## Run on all .txt files the doctest, convert to doxygen and run doxygen
+# -*- coding: utf-8 -*-
+##
+# @file
+# @brief Run on all .txt files the doctest, convert to doxygen and run doxygen
 import doctest, os
 
 noFailure = True

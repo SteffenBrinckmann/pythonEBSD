@@ -1,7 +1,7 @@
-# -*- coding: UTF-8 no BOM -*-
-#
+# -*- coding: utf-8 -*-
+##
 # @file
-# @brief Quaternion: mathematical rotation description
+# @brief Quaternion = mathematical rotation description
 #
 # Part of DAMASK (http:\\damask.mpie.de); Martin Diehl, Philip Eisenlohr, Franz Roters
 # vector versions by Steffen Brinckmann

@@ -1,19 +1,6 @@
 /** \file
 \brief Tutorials for ebsd
 
-\section todo TODO-list
-- What is the definition of the .crc fields, e.g. BC, BS,.. and the .org fields, e.g. CI, IQ, ...
-
-\section overview Overview
-Features:
-  - File formats accepted .ang | .osc | .crc | .txt
-  - fast plotting interaction using virtual mask (only used for plotting);
-    even though some interpolation and reading takes time
-
-\section futureFeatures Future features
-- improve cleaning, grain identification methods
-- add different symmetries than cubic, and test
-
 \section tutorials Tutorials
 
 \subsection example1 Example: Read EBSD data and plot the ND IPF
@@ -197,35 +184,35 @@ doctest 485217143
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="HTMLInput/ebsd_OIM_ND.bmp"    height=300px></td>
-  <td><image src="HTMLInput/ebsd_mTex_ND.png"   height=300px></td>
-  <td><image src="HTMLInput/ebsd_py_ND.png"     height=300px></td></tr>
+  <td><image src="../HTMLInput/ebsd_OIM_ND.bmp"    height=300px></td>
+  <td><image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px></td>
+  <td><image src="../HTMLInput/ebsd_py_ND.png"     height=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="HTMLInput/ebsd_OIM_RD.bmp"    height=300px></td>
+  <td><image src="../HTMLInput/ebsd_OIM_RD.bmp"    height=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="HTMLInput/ebsd_py_RD.png"     height=300px></td></tr>
+  <td><image src="../HTMLInput/ebsd_py_RD.png"     height=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="HTMLInput/ebsd_OIM_PF001.bmp"    height=200px></td>
-  <td><image src="HTMLInput/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="HTMLInput/ebsd_py_PF100.png"     height=200px></td></tr>
+  <td><image src="../HTMLInput/ebsd_OIM_PF001.bmp"    height=200px></td>
+  <td><image src="../HTMLInput/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="../HTMLInput/ebsd_py_PF100.png"     height=200px></td></tr>
 <tr><td><center>PF [100] contour</center> </td>
   <td><center>I cannot produce</center></td>
-  <td><image src="HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="HTMLInput/ebsd_py_PF100Contour.png"     height=200px></td></tr>
+  <td><image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="../HTMLInput/ebsd_py_PF100Contour.png"     height=200px></td></tr>
 <tr><td><center>PF [111]</center> </td>
-  <td><image src="HTMLInput/ebsd_OIM_PF111.bmp"    height=200px></td>
-  <td><image src="HTMLInput/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="HTMLInput/ebsd_py_PF111.png"     height=200px></td></tr>
+  <td><image src="../HTMLInput/ebsd_OIM_PF111.bmp"    height=200px></td>
+  <td><image src="../HTMLInput/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="../HTMLInput/ebsd_py_PF111.png"     height=200px></td></tr>
 </table>
 
 Issues from mTex:
 <ul>
 <li>.bmp (left): low color number when exporting from external window. .png works (right)<br>
-<image src="HTMLInput/ebsd_mTex_ND.bmp"   height=300px>
-<image src="HTMLInput/ebsd_mTex_ND.png"   height=300px>
+<image src="../HTMLInput/ebsd_mTex_ND.bmp"   height=300px>
+<image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px>
 <li>Explicitly select x-axis as North and z-axis as outOfPlane; normal orientation has different result, although it should be the same<br>
-<image src="HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
-<image src="HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
+<image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
+<image src="../HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
 </ul>
 \endhtmlonly
 
@@ -259,17 +246,17 @@ Average orientation [  79.12    9.81  281.32]
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
-  <td><image src="HTMLInput/bc_mTex_ND.png"   width=300px></td>
-  <td><image src="HTMLInput/bc_py_ND.png"     width=300px></td></tr>
+  <td><image src="../HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
+  <td><image src="../HTMLInput/bc_mTex_ND.png"   width=300px></td>
+  <td><image src="../HTMLInput/bc_py_ND.png"     width=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
+  <td><image src="../HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="HTMLInput/bc_py_RD.png"     width=300px></td></tr>
+  <td><image src="../HTMLInput/bc_py_RD.png"     width=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
-  <td><image src="HTMLInput/bc_mTex_PF.png"   height=200px></td>
-  <td><image src="HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+  <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
+  <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
+  <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
 </table>
 \endhtmlonly
 

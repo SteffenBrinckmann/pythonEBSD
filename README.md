@@ -15,25 +15,28 @@ I look for more contributors, see below
   - some educational plotting
   - examples and lots of docummentation via Doxygen
   - doctest verifies functionality
+  - introduce Kernel average misorientation
 
-
+  
 EBSD-Inverse Pole Figure (IPF) of polycrystalline Copper
-![EBSD of polycrystalline Copper](docs/HTMLInput/ebsd_py_ND.png)
+![EBSD of polycrystalline Copper](HTMLInput/ebsd_py_ND.png)
 
 corresponding pole-figure
-![Pole figure](docs/HTMLInput/ebsd_py_PF100.png)
+![Pole figure](HTMLInput/ebsd_py_PF100.png)
 
 
 # Documentation
-[Documentation on github pages](https://steffenbrinckmann.github.io/pythonEBSD/index.html)
+[Documentation on github pages](docs/index.html)
 
 # What features I do not envision:
   - include all crystal symmetries (materials science can mostly live with few)
   - other Euler angle definitions than Bunge; materials science does not use those
 
 # Future features
-  - introduce Kernel average misorientation
-  - improve cleaning, grain identification methods
+  - improve cleaning
+  - grain identification methods
+  - speed up simulation
+  - add different symmetries than cubic, and test
 
 # Help wanted
  - sample files other than copper OIM files

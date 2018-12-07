@@ -551,7 +551,9 @@ class EBSD:
     Args:
        idx: index to find [if None: calculate all]
        layers: number of neighboring layers
-    Returns: array of neighbors; values =-10: invalid points
+
+    Returns:
+     array of neighbors; invalid points have a value=-10
     """
     l = self.periodicLen
     if layers==1:

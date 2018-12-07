@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 no BOM -*-
-#
+##
 # @file
 # @brief Material symmetry class; this class only stores lattice: cubic, hexagonal
 #
