@@ -22,8 +22,6 @@ Steffen Brinckmann<br>
   - doctest verifies functionality
   - introduce Kernel average misorientation
 
-\section futureFeatures Future features
-
 
 \section files python code
 - \ref ebsd.EBSD read/use EBSD, to me merged with ebsd_CodeFromMA.py
