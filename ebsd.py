@@ -64,12 +64,17 @@ class EBSD:
     else:
       print "This file-extension is not implemented yet"
       sys.exit(2)
+
+    #basic tests
     if self.stepSizeY is None: self.stepSizeY=self.stepSizeX
     if self.stepSizeX<0.00001 and self.stepSizeY>0.00001:
       self.stepSizeX = self.stepSizeY
     print "   Read file with step size:",self.stepSizeX, self.stepSizeY
     print "   Optimal image pixel size:",int(self.width/self.stepSizeX)
     print "   Number of points:",len(self.x)
+    if np.max(self.x)>10000.0 or np.max(self.y)>10000.0 :
+      print "Error in reading in ebsd.py (possibly latest version of .osc)"
+      return
 
     #convert into quaternions and only use that
     eulers= np.vstack( (self.phi1,self.PHI,self.phi2) )
@@ -80,10 +85,10 @@ class EBSD:
     self.image   = None
     self.mask    = self.CI > -1         #all are visible initially
     self.vMask = np.ones_like(self.x, dtype=np.bool)
+    self.periodicLen = np.where( (self.x[1:]-self.x[:-1])<0 )[0][0]+1
     if not self.doctest:
       print "   Duration init: ",int(np.round(time.time()-startTime)),"sec"
     return
-
 
 
   def loadANG(self, fileName=None):
@@ -119,16 +124,16 @@ class EBSD:
       return
     # read data: print "Reading file, this can take a bit..."
     data = np.loadtxt(fileHandle)
-    self.phi1      = data[:,0].astype(np.float16)
-    self.PHI       = data[:,1].astype(np.float16)
-    self.phi2      = data[:,2].astype(np.float16)
-    self.x         = data[:,3].astype(np.float32)
-    self.y         = data[:,4].astype(np.float32)
-    self.IQ        = data[:,5].astype(np.float16)
-    self.CI        = data[:,6].astype(np.float16)
+    self.phi1      = data[:,0].astype(np.float)
+    self.PHI       = data[:,1].astype(np.float)
+    self.phi2      = data[:,2].astype(np.float)
+    self.x         = data[:,3].astype(np.float)
+    self.y         = data[:,4].astype(np.float)
+    self.IQ        = data[:,5].astype(np.float)
+    self.CI        = data[:,6].astype(np.float)
     self.phaseID   = data[:,7].astype(np.uint8)
     self.SEMsignal = data[:,8].astype(np.uint8)
-    self.fit       = data[:,9].astype(np.float16)
+    self.fit       = data[:,9].astype(np.float)
     self.width     = max(self.x)
     self.height    = max(self.y)
     self.ratio     = self.width/self.height
@@ -539,14 +544,82 @@ class EBSD:
     return
 
 
+  def neighbors(self, idx=None,layers=1):
+    """
+    identify neighboring indexes
+
+    Args:
+       idx: index to find [if None: calculate all]
+       layers: number of neighboring layers
+    Returns: array of neighbors; values =-10: invalid points
+    """
+    l = self.periodicLen
+    if layers==1:
+      if idx is None:
+        original = np.outer(np.arange(len(self.x),dtype=np.int), np.ones([6,],dtype=np.int))
+        neighbors = original.copy()
+        neighbors[:,0] += -l
+        neighbors[:,1] += -l+1
+        neighbors[:,2] += -1
+        neighbors[:,3] += +1
+        neighbors[:,4] += +l-1
+        neighbors[:,5] += +l
+      else:
+        neighbors = np.array([-l,-l+1,  -1,+1,  +l-1,+l])+idx
+    elif layers==2:
+      neighbors = np.array([-l-1,-l,-l+1,-l+2,  -2,-1,+1,+2,  +l-2,+l-1,+l,+l+1])+idx
+    else:
+      print "number of layers not implemented"
+      return None
+    neighbors[neighbors<0]            = -10
+    neighbors[neighbors>=len(self.x)] = -10
+    mask = (self.x[neighbors]-self.x[original])>(self.stepSizeX*1.1)  #only check for distance in x; b/c check in y already done by previous lines
+    neighbors[mask] = -10
+    return neighbors
+
+
+  def calcKAM(self, layers=1):
+    """
+    calculate Kerner Average Misorientation in DEGREES (because user focused)
+
+    Args:
+       layers: number of neighboring layers used for KAM (more: slower)
+    """
+    startTime    = time.time()
+    sym          = self.sym[0]
+    neighbors    = self.neighbors()
+    fzThreshold  = math.sqrt(2.0)-1.0
+    qConj        = self.quaternions.conjugated()
+    angles       = np.empty_like(neighbors, dtype=np.float)
+    neighborSymQ = sym.symmetryQuats()
+    symQ         = neighborSymQ[0]
+    for iNeighbor in range(6):
+      neighborQ    = self.quaternions[neighbors[:,iNeighbor]]
+      misQ         = (self.quaternions.conjugated() * neighborQ).copy()
+      foundAngle   = np.zeros( (len(self.x)), dtype=np.bool )
+      for nSQ in neighborSymQ:
+        theQ = symQ.conjugated()*misQ*nSQ
+        for k in xrange(2): #try both conjugated versions
+          theQ.conjugate()  #verified before
+          theQ_Rod = abs(theQ.asRodrigues())
+          inFZ = np.logical_and( \
+            np.logical_and(fzThreshold>=theQ_Rod[0],fzThreshold>=theQ_Rod[1]) , \
+            np.logical_and(fzThreshold>=theQ_Rod[2],1.0>=np.sum(theQ_Rod, axis=0)) )
+          #angle = theQ.asAngleAxis()[0]  #much slower: requires additional class; slight differences to faster version
+          angle= 2.0*np.arctan(  np.linalg.norm(theQ_Rod, axis=0)  )
+          foundAngle[inFZ] = True
+          angles[inFZ,iNeighbor] = angle[inFZ]
+        if np.all(foundAngle): break   #stop looking for alternatives if filled already all
+    self.kam = np.degrees( np.nanmean(angles, axis=1) )
+    print "Duration KAM evaluation: ",int(np.round(time.time()-startTime)),"sec"
+    return
+
 
   #@}
   ##
   # @name PLOT METHODS
   #@{
-
-
-  def plot(self, vector, widthPixel=None, maximum="", minimum="", interpolationType="nn", cmap=None, show=True, cbar=True):
+  def plot(self, vector, widthPixel=None, vmax="", vmin="", interpolationType="nn", cmap=None, show=True, cbar=True):
     """
     given a class-vector, plot the vector as an image<br>
     the x and y are given by the class-vector x and y
@@ -554,8 +627,8 @@ class EBSD:
     Args:
        vector: vector to be plotted as a 2D image
        widthPixel: rescale to horizontal size of the image [default: optimal pixel width]
-       maximum: rescale z-scale to maximal value
-       minimum: rescale z-scale to minimal value
+       vmax: rescale z-scale to maximal value
+       vmin: rescale z-scale to minimal value
        interpolationType: interpolation type [default: "nn" next-neighbor]
     """
     startTime = time.time()
@@ -578,9 +651,9 @@ class EBSD:
     x, y = np.meshgrid(xAxis, yAxis)
     z = mlab.griddata( self.x[self.vMask], self.y[self.vMask], vector[self.vMask],  x,y, interpolationType)
     mask = mlab.griddata( self.x[self.vMask], self.y[self.vMask], ~self.mask[self.vMask],  x,y, interpolationType)
-    #plot if/if-not the maximum and minimum are given
-    if maximum!="" and minimum!="":
-      plt.imshow( np.ma.masked_where(mask, z) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, vmax=maximum, vmin=minimum, origin='upper')
+    #plot if/if-not the vmax and vmin are given
+    if vmax!="" and vmin!="":
+      plt.imshow( np.ma.masked_where(mask, z) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, vmax=vmax, vmin=vmin, origin='upper')
     else:
       plt.imshow( np.ma.masked_where(mask, z) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, origin='upper')
     maxZ  = np.max(z)

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 ## Run on all .txt files the doctest, convert to doxygen and run doxygen
-import doctest
-import os
+import doctest, os
 
 noFailure = True
 for fileName in os.listdir("."):
@@ -20,8 +19,6 @@ for fileName in os.listdir("."):
     txtFile.close()
     doxyFile.close()
 
-if os.path.exists('doxygenOutput.txt'):
-  os.unlink("doxygenOutput.txt")
 os.system("doxygen")
 os.system("rm *.doxy")
 if os.path.exists('doctest.png'):
@@ -34,8 +31,9 @@ if noFailure:
   gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n"
   with open(".gitignore", "w") as fout:
     fout.write(gitignoreRemote)
-  os.system("git add -A")
-  os.system('git commit -m "'+message+'"')
-  os.system('git push -u origin master')
+  os.system("git add -A")                 #add all (incl. docs) to tracking
+  os.system('git commit -m "'+message+'"')#commit, incl. locally
+  os.system('git push -u origin master')  #send to github, incl. docs
   with open(".gitignore", "w") as fout:
     fout.write(gitignoreLocal)
+  os.system("git rm --cached docs/\*")    #remove docs from being tracked

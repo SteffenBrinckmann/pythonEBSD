@@ -124,7 +124,6 @@ class Orientation:
   ##
   # @name MATERIAL SPECIFIC ROUTINES
   #@{
-
   def disorientation(self, other, SST = True):
     """Disorientation between myself and given other orientation.
 
@@ -137,26 +136,23 @@ class Orientation:
       SST: True (rotation axis falls into SST); False
 
     Returns:
-      disorientation angle
+      disorientation quaternion, idx of equivalent orientation1, idx of equivalent orientation2, num. of conjugated
     """
-
     if self.symmetry != other.symmetry: raise TypeError('disorientation between different symmetry classes not supported yet.')
     misQ = self.quaternion.conjugated()*other.quaternion
     mySymQs    =  self.symmetry.symmetryQuats() if SST else self.symmetry.symmetryQuats()[:1]       # take all or only first sym operation
     otherSymQs = other.symmetry.symmetryQuats()
-    for i,sA in enumerate(mySymQs):
-      for j,sB in enumerate(otherSymQs):
+    for i,sA in enumerate(mySymQs):  #if not in SST: only one sA
+      for j,sB in enumerate(otherSymQs): #changes always
         theQ = sA.conjugated()*misQ*sB
-        for k in xrange(2):
+        for k in xrange(2):  #try both conjugated versions
           theQ.conjugate()
-          breaker = self.symmetry.inFZ(theQ) \
-                    and (not SST or other.symmetry.inDisorientationSST(theQ))
+          breaker = self.symmetry.inFZ(theQ) and (not SST or other.symmetry.inDisorientationSST(theQ))
           if breaker: break
         if breaker: break
       if breaker: break
     return (Orientation(quaternion = theQ,symmetry = self.symmetry.lattice),
             i,j,k == 1)                                                                             # disorientation, own sym, other sym, self-->other: True, self<--other: False
-
 
 
   def inversePole(self, axis, proper = False, SST = True):
@@ -266,7 +262,7 @@ class Orientation:
     return
 
 
-  def plotLine(self, ax, start,delta,color='k',lw=1, markerSize=None):
+  def plotLine(self, ax, start,delta,color='k',lw=1, ls='solid', markerSize=None):
     """
     Plot one line using given projection
 
@@ -276,6 +272,7 @@ class Orientation:
        delta: delta cooradinate (end-start)
        color: color
        lw: line width
+       ls: line style "solid",'dashed'
        markerSize: size of marker (only used for non-lines: delta>0)
     """
     if np.linalg.norm(delta)<self.eps:
@@ -288,12 +285,12 @@ class Orientation:
       ax.plot( [start[0]]+[start[0]+delta[0]],
                [start[1]]+[start[1]+delta[1]],
                [start[2]]+[start[2]+delta[2]],
-               color=color,lw=lw, marker=marker, markersize=markerSize)
+               color=color,lw=lw, marker=marker, ls=ls, markersize=markerSize)
     else:
       x,y = self.project([start[0]]+[start[0]+delta[0]],
                     [start[1]]+[start[1]+delta[1]],
                     [start[2]]+[start[2]+delta[2]])
-      ax.plot(x,y,  color=color,lw=lw, marker=marker, markersize=markerSize)
+      ax.plot(x,y,  color=color,lw=lw, marker=marker, ls=ls, markersize=markerSize)
     return
 
 
@@ -319,9 +316,9 @@ class Orientation:
       ax.text(x+0.1, y+s,   z+0.1,ylabel )
       ax.text(x+0.1, y+0.1, z+s  ,zlabel )
     else:
-      ax.text(*(self.project(x+s,   y+0.1, z+0.1)+(xlabel,)) )
-      ax.text(*(self.project(x+0.1, y+s,   z+0.1)+(ylabel,)) )
-      ax.text(*(self.project(x+0.1, y+0.1, z+s  )+(zlabel,)) )
+      ax.text(*(self.project(x+s,   y  , z+0.1)+(xlabel,)) )
+      ax.text(*(self.project(x+0.1, y+s, z+0.1)+(ylabel,{"ha":"right"})) )
+      ax.text(*(self.project(x+0.1, y  , z+s  )+(zlabel,)) )
     return
 
 
