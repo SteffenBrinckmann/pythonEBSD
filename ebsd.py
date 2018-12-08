@@ -611,8 +611,11 @@ class EBSD:
           angle= 2.0*np.arctan(  np.linalg.norm(theQ_Rod, axis=0)  )
           foundAngle[inFZ] = True
           angles[inFZ,iNeighbor] = angle[inFZ]
+          mask = self.CI[ neighbors[:,iNeighbor] ]==-1.0
+          angles[mask,iNeighbor] = np.nan
         if np.all(foundAngle): break   #stop looking for alternatives if filled already all
     self.kam = np.degrees( np.nanmean(angles, axis=1) )
+    self.kam[ self.CI==-1.0 ] = np.nan
     print "Duration KAM evaluation: ",int(np.round(time.time()-startTime)),"sec"
     return
 
