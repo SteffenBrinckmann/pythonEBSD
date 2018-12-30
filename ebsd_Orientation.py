@@ -14,8 +14,7 @@ from ebsd_Quaternion import Quaternion
 class Orientation:
   """Orientation class: combination of material symmetry and specific rotation
   """
-
-  __slots__ = ['quaternion','symmetry']
+  __slots__ = ['quaternion', 'symmetry', 'plot2D', 'eps', 'doctest']
 
   # @name CONVENTIONAL ROUTINES
   #@{
@@ -36,7 +35,7 @@ class Orientation:
         self.quaternion = Quaternion.fromRandom(randomSeed=random)
     elif isinstance(Eulers, np.ndarray) and Eulers.shape == (3,):                                   # based on given Euler angles
       self.quaternion = Quaternion.fromEulers(Eulers,'bunge')
-    elif isinstance(matrix, np.ndarray) :                                                           # based on given rotation matrix
+    elif isinstance(matrix, np.ndarray):                                                            # based on given rotation matrix
       self.quaternion = Quaternion.fromMatrix(matrix)
     elif isinstance(angleAxis, np.ndarray) and angleAxis.shape == (4,):                             # based on given angle and rotation axis
       self.quaternion = Quaternion.fromAngleAxis(angleAxis[0],angleAxis[1:4])
@@ -47,9 +46,10 @@ class Orientation:
     elif isinstance(quaternion, np.ndarray) and quaternion.shape == (4,):                           # based on given quaternion
       self.quaternion = Quaternion(quaternion).homomorphed()
     self.symmetry = Symmetry(symmetry)
-    self.plot2D   = "down-right"
+    self.plot2D = "down-right"
     self.eps = 1e-6
-    self.doctest  = False
+    self.doctest = False
+    return
 
 
 
@@ -107,8 +107,7 @@ class Orientation:
 
   def equivalentOrientations(self,
                              who = []):
-    return map(lambda q: Orientation(quaternion = q, symmetry = self.symmetry.lattice),
-               self.equivalentQuaternions(who))
+    return [Orientation(quaternion = q, symmetry = self.symmetry.lattice) for q in self.equivalentQuaternions(who)]
 
 
   def reduced(self):
@@ -147,7 +146,7 @@ class Orientation:
     for i,sA in enumerate(mySymQs):
       for j,sB in enumerate(otherSymQs):
         theQ = sA.conjugated()*misQ*sB
-        for k in xrange(2):
+        for k in range(2):
           theQ.conjugate()
           breaker = self.symmetry.inFZ(theQ) \
                     and (not SST or other.symmetry.inDisorientationSST(theQ))
@@ -255,14 +254,14 @@ class Orientation:
       elif self.plot2D=='right-up'  :  return  x, y
       elif self.plot2D=='left-down' :  return -x,-y
       elif self.plot2D=='3D':          return  x, y, z
-      else:   print "Error: plot2D not well defined: plotLine"
+      else:   print("Error: plot2D not well defined: plotLine")
     else:
       if   self.plot2D=='down-right':  return  y,-x
       elif self.plot2D=='up-left'   :  return -y, x
       elif self.plot2D=='right-up'  :  return  x, y
       elif self.plot2D=='left-down' :  return -x,-y
       elif self.plot2D=='3D':          return  x, y, z
-      else:   print "Error: plot2D not well defined: plotLine"
+      else:   print("Error: plot2D not well defined: plotLine")
     return
 
 
@@ -427,16 +426,16 @@ class Orientation:
     Args:
       equivalent: print also equivalent orientations
     """
-    print "Euler angles:",np.round(self.quaternion.asEulers(degrees=True),1)
+    print("Euler angles:",np.round(self.quaternion.asEulers(degrees=True),1))
     rotM = self.quaternion.asMatrix()
-    print "HKL",np.array( rotM[2,:]/np.min(rotM[2,:]) ,dtype=np.int)
-    print "UVW",-np.array( rotM[0,:]/np.min(rotM[0,:]) ,dtype=np.int)
+    print("HKL",np.array( rotM[2,:]/np.min(rotM[2,:]) ,dtype=np.int))
+    print("UVW",-np.array( rotM[0,:]/np.min(rotM[0,:]) ,dtype=np.int))
     if equivalent:
-      print "Equivalent orientations - Euler angles:"
+      print("Equivalent orientations - Euler angles:")
       for q in self.symmetry.equivalentQuaternions(self.quaternion):
         angles = q.asEulers(degrees=True)
         angles[angles<0] += 360.
-        print "   [%5.1f  %5.1f  %5.1f]"%tuple(angles)
+        print("   [%5.1f  %5.1f  %5.1f]"%tuple(angles))
     return
 
 

@@ -20,15 +20,15 @@ Each example creates an angle from 3 float values, creates an orientation and ro
 >>> angle = np.radians([0,0,0])
 >>> o = Orientation(Eulers=angle, symmetry="cubic")
 >>> np.round(o.IPFcolor( [0,0,1] ),3)
-array([ 1.,  0.,  0.])
+array([1., 0., 0.])
 >>> angle = np.radians([0,45,0])
 >>> o = Orientation(Eulers=angle, symmetry="cubic")
 >>> np.round(o.IPFcolor( [0,0,1] ),3)
-array([ 0.,  1.,  0.])
+array([0., 1., 0.])
 >>> angle = np.radians([0,55,45])
 >>> o = Orientation(Eulers=angle, symmetry="cubic")
 >>> np.round(o.IPFcolor( [0,0,1] ),3)
-array([ 0.  ,  0.09,  1.  ])
+array([0.  , 0.09, 1.  ])
 
 \endverbatim
 
@@ -36,8 +36,8 @@ array([ 0.  ,  0.09,  1.  ])
 and verify
 \image html ebsd_Orientation1.png
 \verbatim
->>> import Image                           #doctest omit line in doxy
->>> import numpy as np                     #doctest omit line in doxy
+>>> from verifyAll import doctestImage
+>>> import numpy as np
 >>> hkl = np.array([1,1,1], dtype=np.float)
 >>> uvw1 = np.array([1,-1,0], dtype=np.float)
 >>> np.dot(hkl,uvw1)
@@ -53,15 +53,15 @@ array([[ 0.70710678, -0.70710678,  0.        ],
 >>> o = Orientation(matrix=rotM, symmetry='cubic')
 >>> o.doctest = True
 >>> o.plot()
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 486813521
+>>> doctestImage("ebsd_Orientation_1")
+doctest 1
 >>> o.plot([1,0,0])
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 485606048
+>>> doctestImage("ebsd_Orientation_2")
+doctest 1
 >>> o.asEulers(degrees=True)
-array([  0.        ,  54.73561032,  45.        ])
+array([ 0.        , 54.73561032, 45.        ])
 >>> np.round(o.IPFcolor( [0,0,1] ),3)                  #should be blue
-array([ 0.,  0.,  1.])
+array([0., 0., 1.])
 
 \endverbatim
 
@@ -71,19 +71,19 @@ OIM software shows the 2D projection with the RD upward. Note, many textbooks ha
 >>> o = Orientation(Eulers=np.radians([0,10,10]), symmetry="cubic")
 >>> o.doctest = True
 >>> o.plot( )
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 486784407
+>>> doctestImage("ebsd_Orientation_3")
+doctest 1
 >>> o.plot(plot2D='up-left')
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 486728369
+>>> doctestImage("ebsd_Orientation_4")
+doctest 1
 >>> o.plot(poles=[1,0,0], plot2D='up-left', scale=1.5)
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 485058635
+>>> doctestImage("ebsd_Orientation_5")
+doctest 1
 >>> o.plot(poles=[1,1,1])
->>> print "doctest",np.sum(np.array(Image.open("doctest.png")))
-doctest 485475338
+>>> doctestImage("ebsd_Orientation_6")
+doctest 1
 >>> o.toScreen(equivalent=False)
-Euler angles: [  0.  10.  10.]
+Euler angles: [ 0. 10. 10.]
 HKL [ 1  5 32]
 UVW [ 5 -1  0]
 
@@ -99,31 +99,31 @@ The HKL and UVW vectors are rounded to integer, hence rough values. They are con
 >>> for q in oHelp.symmetry.equivalentQuaternions(oHelp.quaternion):
 ...   axis      = q.conjugated()*np.array([1,0,0])
 ...   direction = o.inversePole( axis, SST=False)[0]
-...   print axis, direction
-[ 1.  0.  0.] [ 1.  0.  0.]
-[ 1.  0.  0.] [ 1.  0.  0.]
+...   print(axis, direction)
+[1. 0. 0.] [1. 0. 0.]
+[1. 0. 0.] [1. 0. 0.]
 [-1.  0.  0.] [-1.  0.  0.]
 [-1.  0.  0.] [-1.  0.  0.]
 [-1.  0.  0.] [-1.  0.  0.]
 [-1.  0.  0.] [-1.  0.  0.]
-[ 0.  0.  1.] [ 0.          0.70710678  0.70710678]
+[0. 0. 1.] [0.         0.70710678 0.70710678]
 [ 0.  0. -1.] [ 0.         -0.70710678 -0.70710678]
 [ 0. -1.  0.] [ 0.         -0.70710678  0.70710678]
-[ 0.  1.  0.] [ 0.          0.70710678 -0.70710678]
-[ 0.  0.  1.] [ 0.          0.70710678  0.70710678]
-[ 0.  1.  0.] [ 0.          0.70710678 -0.70710678]
+[0. 1. 0.] [ 0.          0.70710678 -0.70710678]
+[0. 0. 1.] [0.         0.70710678 0.70710678]
+[0. 1. 0.] [ 0.          0.70710678 -0.70710678]
 [ 0.  0. -1.] [ 0.         -0.70710678 -0.70710678]
-[ 0.  0.  1.] [ 0.          0.70710678  0.70710678]
+[0. 0. 1.] [0.         0.70710678 0.70710678]
 [ 0.  0. -1.] [ 0.         -0.70710678 -0.70710678]
 [ 0. -1.  0.] [ 0.         -0.70710678  0.70710678]
-[ 0.  1.  0.] [ 0.          0.70710678 -0.70710678]
+[0. 1. 0.] [ 0.          0.70710678 -0.70710678]
 [ 0. -1.  0.] [ 0.         -0.70710678  0.70710678]
-[ 0.  1.  0.] [ 0.          0.70710678 -0.70710678]
+[0. 1. 0.] [ 0.          0.70710678 -0.70710678]
 [ 0. -1.  0.] [ 0.         -0.70710678  0.70710678]
 [ 0.  0. -1.] [ 0.         -0.70710678 -0.70710678]
-[ 0.  0.  1.] [ 0.          0.70710678  0.70710678]
-[ 1.  0.  0.] [ 1.  0.  0.]
-[ 1.  0.  0.] [ 1.  0.  0.]
+[0. 0. 1.] [0.         0.70710678 0.70710678]
+[1. 0. 0.] [1. 0. 0.]
+[1. 0. 0.] [1. 0. 0.]
 
 \endverbatim
 
@@ -132,8 +132,8 @@ The HKL and UVW vectors are rounded to integer, hence rough values. They are con
 >>> a = Orientation(Eulers=np.radians([0,45,0]), symmetry='cubic')
 >>> b = Orientation(Eulers=np.radians([0,0,0]), symmetry='cubic')
 >>> avg = Orientation.average([a,b,b])                       #take orientation b twice
->>> print "Rotation angles",avg.asEulers(degrees=True)
-Rotation angles [  0.         14.6388066   0.       ]
+>>> print("Rotation angles",avg.asEulers(degrees=True))
+Rotation angles [ 0.        14.6388066  0.       ]
 
 \endverbatim
 

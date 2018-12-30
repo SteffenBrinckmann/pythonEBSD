@@ -21,7 +21,7 @@ class Symmetry:
   #@{
 
   def __init__(self, symmetry = None):
-    if isinstance(symmetry, basestring) and symmetry.lower() in Symmetry.lattices:
+    if isinstance(symmetry, str) and symmetry.lower() in Symmetry.lattices:
       self.lattice = symmetry.lower()
     else:
       self.lattice = None
@@ -121,8 +121,8 @@ class Symmetry:
       symQuats =  [
                     [ 1.0,0.0,0.0,0.0 ],
                   ]
-    return map(Quaternion,
-               np.array(symQuats)[np.atleast_1d(np.array(who)) if who != [] else xrange(len(symQuats))])
+    return list(map(Quaternion,
+               np.array(symQuats)[np.atleast_1d(np.array(who)) if who != [] else range(len(symQuats))]))
 
 
   def unitCell(self):
@@ -165,7 +165,7 @@ class Symmetry:
                    ]
       unitCell = list(np.array(unitCell)/2.)
     else:
-      print "Unit cell not implemented"
+      print("Unit cell not implemented")
       unitCell = [[None]]
     return unitCell
 
@@ -343,11 +343,11 @@ class Symmetry:
          hkl vector
       """
       if self.lattice != 'cubic':
-        print "ERROR: only implemented for cubic lattice"
+        print("ERROR: only implemented for cubic lattice")
         return
       l = 2.0/ ( inPlane[0]*inPlane[0] + inPlane[1]*inPlane[1] + 1.)
       if inPlane.ndim==1:
-        print l
+        print(l)
         hkl =np.zeros((3), dtype=np.float)
         hkl[:2]=l*inPlane
         hkl[2]=l-1.0
@@ -373,7 +373,7 @@ class Symmetry:
     """
     from scipy.interpolate import interp1d
     if self.lattice != 'cubic':
-      print "ERROR: only implemented for cubic lattice"
+      print("ERROR: only implemented for cubic lattice")
       return
     #create border
     border = [[0,0]]

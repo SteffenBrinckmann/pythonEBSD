@@ -52,7 +52,7 @@ class Quaternion:
       if "float" in type(self.w).__name__:
         return 'Quaternion(real=%+.6f, imag=<%+.6f, %+.6f, %+.6f>)' % (self.w, self.x, self.y, self.z)
       else:
-	return 'Array of Quaternions of length '+str(len(self.w))
+        return 'Array of Quaternions of length '+str(len(self.w))
 
 
     def __ne__(self,other):
@@ -173,7 +173,7 @@ class Quaternion:
 
 
     def __div__(self, other):
-      if isinstance(other, (int,float,long)):
+      if isinstance(other, (int,float)):
         w = self.w / other
         x = self.x / other
         y = self.y / other
@@ -184,7 +184,7 @@ class Quaternion:
 
 
     def __idiv__(self, other):
-      if isinstance(other, (int,float,long)):
+      if isinstance(other, (int,float)):
           self.w /= other
           self.x /= other
           self.y /= other
@@ -294,11 +294,11 @@ class Quaternion:
           self.y = -self.y
           self.z = -self.z
       else:
-	mask = self.w<0.0
-	self.w[mask] = -self.w[mask]
-	self.x[mask] = -self.x[mask]
-	self.y[mask] = -self.y[mask]
-	self.z[mask] = -self.z[mask]
+        mask = self.w<0.0
+        self.w[mask] = -self.w[mask]
+        self.x[mask] = -self.x[mask]
+        self.y[mask] = -self.y[mask]
+        self.z[mask] = -self.z[mask]
       return self
 
 
@@ -400,8 +400,8 @@ class Quaternion:
           angles[2] %= 2*math.pi
         return np.round(np.degrees(angles),round) if degrees else angles
       else:  						#vector version
-	angles = np.zeros( (3,len(self.w) ))
-	mask1 = np.logical_and( np.abs(self.x)<1e-4, np.abs(self.y)<1e-4 )
+        angles = np.zeros( (3,len(self.w) ))
+        mask1 = np.logical_and( np.abs(self.x)<1e-4, np.abs(self.y)<1e-4 )
         x = self.w[mask1]**2 - self.z[mask1]**2
         y = 2.*self.w[mask1]*self.z[mask1]
         angles[0,mask1] = np.arctan2(y,x)
@@ -485,19 +485,19 @@ class Quaternion:
     def fromEulers(cls, eulers, type = 'Bunge'):
       eulers *= 0.5                       # reduce to half angles
       if eulers.ndim==1:
-	c1 = math.cos(eulers[0])
-	s1 = math.sin(eulers[0])
-	c2 = math.cos(eulers[1])
-	s2 = math.sin(eulers[1])
-	c3 = math.cos(eulers[2])
-	s3 = math.sin(eulers[2])
+        c1 = math.cos(eulers[0])
+        s1 = math.sin(eulers[0])
+        c2 = math.cos(eulers[1])
+        s2 = math.sin(eulers[1])
+        c3 = math.cos(eulers[2])
+        s3 = math.sin(eulers[2])
       else:
-	c1 = np.cos(eulers[0,:])
-	s1 = np.sin(eulers[0,:])
-	c2 = np.cos(eulers[1,:])
-	s2 = np.sin(eulers[1,:])
-	c3 = np.cos(eulers[2,:])
-	s3 = np.sin(eulers[2,:])
+        c1 = np.cos(eulers[0,:])
+        s1 = np.sin(eulers[0,:])
+        c2 = np.cos(eulers[1,:])
+        s2 = np.sin(eulers[1,:])
+        c3 = np.cos(eulers[2,:])
+        s3 = np.sin(eulers[2,:])
       if type.lower() == 'bunge' or type.lower() == 'zxz':
         w =   c1 * c2 * c3 - s1 * c2 * s3
         x =   c1 * s2 * c3 + s1 * s2 * s3

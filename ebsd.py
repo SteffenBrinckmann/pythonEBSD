@@ -3,18 +3,20 @@
 # @file
 # @brief Class to allow for read EBSD data
 #
-import math, Image, time, os, sys
-import ImageDraw, ImageFont, ImageChops
+import math
+from PIL import Image, ImageDraw, ImageFont, ImageChops
+import time, os, sys, io
 import numpy as np
 import scipy.ndimage as ndi
+from scipy.stats import gaussian_kde
+from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from matplotlib import mlab
-from matplotlib import colors
-from scipy.stats import gaussian_kde
+from matplotlib import mlab, colors
 from ebsd_Orientation import Orientation
 from ebsd_Symmetry import Symmetry
 from ebsd_Quaternion import Quaternion
+
 
 class EBSD:
   """Class to allow for read EBSD data.
@@ -24,7 +26,7 @@ class EBSD:
 
   ##
   # @name INPUT METHODS
-  #@{
+  # @{
   def __init__(self, fileName, doctest=False):
     """
     read input file <br>
@@ -35,87 +37,85 @@ class EBSD:
     Args:
        fileName: file name in the present directory
     """
-    #initialize
+    # initialize
     startTime = time.time()
     fontName = 'arial.ttf'
     self.fontFile = ""
     for path in sys.path:
-      fontFile = os.path.join(path,fontName)
+      fontFile = os.path.join(path, fontName)
       if os.path.isfile(fontFile):
-        #print "Found font file:", fontFile
+        # print "Found font file:", fontFile
         self.fontFile = fontFile
     self.scanUnit = "um"
     self.sym = []
     self.doctest = doctest
 
-    #read input file header and parse it
+    # read input file header and parse it
     self.fileName = fileName
-    if (self.fileName[-3:]=="ang"):
+    if (self.fileName[-3:] == "ang"):
       self.loadANG()
-    elif (self.fileName[-3:]=="osc"):
+    elif (self.fileName[-3:] == "osc"):
       self.loadOSC()
-    elif (self.fileName[-3:]=="txt"):
+    elif (self.fileName[-3:] == "txt"):
       self.loadTXT()
-    elif (self.fileName[-3:]=="crc"):
+    elif (self.fileName[-3:] == "crc"):
       self.loadCRC()
-    elif (self.fileName[:4]=='void'):
-      print "Void mode",self.fileName[4:]
+    elif (self.fileName[:4] == 'void'):
+      print("Void mode", self.fileName[4:])
       self.loadVoid(self.fileName[4:])
     else:
-      print "This file-extension is not implemented yet"
+      print("This file-extension is not implemented yet")
       sys.exit(2)
-    if self.stepSizeY is None: self.stepSizeY=self.stepSizeX
-    if self.stepSizeX<0.00001 and self.stepSizeY>0.00001:
+    if self.stepSizeY is None: self.stepSizeY = self.stepSizeX
+    if self.stepSizeX < 0.00001 and self.stepSizeY > 0.00001:
       self.stepSizeX = self.stepSizeY
-    print "   Read file with step size:",self.stepSizeX, self.stepSizeY
-    print "   Optimal image pixel size:",int(self.width/self.stepSizeX)
-    print "   Number of points:",len(self.x)
+    print("   Read file with step size:", self.stepSizeX, self.stepSizeY)
+    print("   Optimal image pixel size:", int(self.width/self.stepSizeX))
+    print("   Number of points:", len(self.x))
 
-    #convert into quaternions and only use that
-    eulers= np.vstack( (self.phi1,self.PHI,self.phi2) )
+    # convert into quaternions and only use that
+    eulers = np.vstack((self.phi1, self.PHI, self.phi2))
     self.quaternions = Quaternion.fromEulers(eulers)
     del self.phi1; del self.PHI; del self.phi2
 
     # for plotting: determine image and imageSize once, use multiple times
-    self.image   = None
-    self.mask    = self.CI > -1         #all are visible initially
+    self.image = None
+    self.mask = self.CI > -1  # all are visible initially
     self.vMask = np.ones_like(self.x, dtype=np.bool)
     if not self.doctest:
-      print "   Duration init: ",int(np.round(time.time()-startTime)),"sec"
+      print("   Duration init: ", int(np.round(time.time()-startTime)), "sec")
     return
-
-
 
   def loadANG(self, fileName=None):
     """
     Load .ang file: filename saved in self. No need to use it
     """
-    if fileName!=None: self.fileName = fileName
-    print "Load .ang file: ",self.fileName
+    if fileName != None: self.fileName = fileName
+    print("Load .ang file: ", self.fileName)
     keys = ['MaterialName', 'LatticeConstants', 'WorkingDistance', 'SEMVoltage', 'GRID:', "Symmetry"]
-    fileHandle = open(self.fileName,'r')
-    keyValues = [''] * len(keys) #actual values
+    fileHandle = open(self.fileName, 'r')
+    keyValues = [''] * len(keys)  # actual values
     for line in fileHandle:
-      if line[0:10]== "# OPERATOR":
-	break
+      if line[0:10] == "# OPERATOR":
+        break
       for key in keys:
-	searchTerm = "# "+key
-	if searchTerm == line[0:len(searchTerm)]:
-	  index = keys.index(key)
-	  value = line.rstrip().split()[2:]
-	  if len(value)==1:
+        searchTerm = "# "+key
+        if searchTerm == line[0:len(searchTerm)]:
+          index = keys.index(key)
+          value = line.rstrip().split()[2:]
+          if len(value)==1:
             value = value[0]
             try:
               value = float(value)
             except:
               pass
-	  keyValues[index] = value
-	  break
-    meta     = dict(zip(keys,keyValues))
+          keyValues[index] = value
+          break
+    meta = dict(list(zip(keys,keyValues)))
     if meta['Symmetry'] == 43:
       self.sym.append( Symmetry('cubic'))
     else:
-      print "ERROR: no symmetry found"
+      print("ERROR: no symmetry found")
       return
     # read data: print "Reading file, this can take a bit..."
     data = np.loadtxt(fileHandle)
@@ -151,9 +151,9 @@ class EBSD:
       fileName: fileName to load (partition data from OIM)
       update: update data or read new (read-new: default)
     """
-    print "TODO: Symmetry has to be read and used"
+    print("TODO: Symmetry has to be read and used")
     startTime = time.time()
-    print "Load .txt file:",fileName
+    print("Load .txt file:",fileName)
     if fileName is None:
       fileName = self.fileName
     fileHandle = open(fileName,'r')
@@ -163,19 +163,19 @@ class EBSD:
       parts = line.split()
       if len(parts)<2: continue
       if parts[1]=="Header:":
-        print "   Header: ",parts[2]
+        print("   Header: ",parts[2])
         continue
       foundKeys[parts[3]] = int( parts[2].split(":")[0].split("-")[0] )
-    print "   Found data:",foundKeys
+    print("   Found data:",foundKeys)
     if "Grain" in foundKeys:  # open new array if data exists
       self.grainID= -np.ones_like(self.phaseID)
 
     # read data
     data = np.loadtxt(fileName)
-    print "   Reading file of size ",data.shape,"  this can take a bit..."
+    print("   Reading file of size ",data.shape,"  this can take a bit...")
     if update:
       self.mask[:] = False
-      print "Warning: this is too slow"
+      print("Warning: this is too slow")
       """
       be intelligent where you seearch, check if old and new data monotonically increases
       then search in sections of equal y
@@ -184,10 +184,10 @@ class EBSD:
       for i in range(data.shape[0]):
         x    = data[i,foundKeys["x,"]   - 1].astype(np.float32)
         y    = data[i,foundKeys["x,"]   - 0].astype(np.float32)
-        #identify index: nice and much much slowes
+        # identify index: nice and much much slowes
         idx = np.argmax(np.logical_and(np.abs(self.x-x)<self.stepSizeX/10.0, \
                                        np.abs(self.y-y)<self.stepSizeX/10.0))     #very save error of 10th of STEPSIZE
-        #update
+        # update
         self.mask[idx] = True
         self.phi1[idx] = data[i,foundKeys["phi1,"] - 1].astype(np.float16)
         self.PHI[idx]  = data[i,foundKeys["phi1,"] - 0].astype(np.float16)
@@ -204,7 +204,7 @@ class EBSD:
           self.SEMsignal[idx] = data[i,foundKeys["sem"] - 1].astype(np.float16)
         if "Grain" in foundKeys:
           self.grainID[idx] = data[i,foundKeys["Grain"] - 1].astype(np.float16)
-        #stepSizeX, width, height etc do not change
+        # stepSizeX, width, height etc do not change
     else: #read new
       self.mask = True
       self.phi1 = data[:,foundKeys["phi1,"] - 1].astype(np.float16)
@@ -230,7 +230,7 @@ class EBSD:
       self.stepSizeX = np.min(delta[delta>0]) #estimate since not ordered
       self.stepSizeY = None
     fileHandle.close()
-    print "Duration loadTXT: ",int(np.round(time.time()-startTime)),"sec"
+    print("Duration loadTXT: ",int(np.round(time.time()-startTime)),"sec")
     return
 
 
@@ -258,7 +258,7 @@ class EBSD:
       fileOut.write(" %8.5f %8.5f %8.5f %12.5f %12.5f %8.3f %6.3f %2d %6d %7.3f\n" % \
 	      (phi1,PHI,phi2,self.x[i],self.y[i],self.IQ[i],self.CI[i],self.phaseID[i],self.SEMsignal[i],self.fit[i]) )
     fileOut.close()
-    print "Duration writeANG: ",int(np.round(time.time()-startTime)),"sec"
+    print("Duration writeANG: ",int(np.round(time.time()-startTime)),"sec")
     return
 
 
@@ -269,9 +269,9 @@ class EBSD:
     Copied from mtex and translated into python
     Warning: SEMsignal not parsed correctly
     """
-    print "TODO: Symmetry has to be read and used"
+    print("TODO: Symmetry has to be read and used")
     if fileName!=None: self.fileName = fileName
-    print "Load .osc file: ",self.fileName
+    print("Load .osc file: ",self.fileName)
     def find_subsequence(seq, subseq):
       target = np.dot(subseq, subseq)
       candidates = np.where(np.correlate(seq, subseq, mode='valid') == target)[0]
@@ -284,17 +284,17 @@ class EBSD:
     header = np.fromfile(f, dtype=np.uint32, count=8)
     n = header[6]   #number of data points
 
-    #find start position by using startByte-pattern
+    # find start position by using startByte-pattern
     bufferLength = int(math.pow(2,20))
     startBytes = np.array( [ int(i,16)  for i in ['B9', '0B', 'EF', 'FF', '02', '00', '00', '00'] ],dtype=np.uint8 )
     startPos = 0
     f.seek(startPos)
     startData = np.fromfile(f, dtype=np.uint8, count=bufferLength)
-    #startPos += [x for x in xrange(len(startData)-len(startBytes)) if (startData[x:x+len(startBytes)] == startBytes).all() ][0]
+    # startPos += [x for x in xrange(len(startData)-len(startBytes)) if (startData[x:x+len(startBytes)] == startBytes).all() ][0]
     startPos += find_subsequence( startData, startBytes)[0]
     f.seek(startPos+8)
 
-    #there are different osc file versions, one does have some count of data, the other proceeds with xStep and yStep (!=1)
+    # there are different osc file versions, one does have some count of data, the other proceeds with xStep and yStep (!=1)
     dn = np.double( np.fromfile(f,dtype=np.uint32, count=1))
     if round(((dn/4-2)/10)/n) != 1:
       f.seek(startPos+8)
@@ -329,9 +329,9 @@ class EBSD:
     import struct
     if fileName!=None: self.fileName = fileName
     cprFileName = self.fileName[:-4]+".cpr"
-    print "Load .crc file: ",self.fileName,cprFileName
+    print("Load .crc file: ",self.fileName,cprFileName)
     if not os.path.exists(cprFileName):
-      print "CPR file does not exist"
+      print("CPR file does not exist")
     cprFile = open(cprFileName,"r")
     cprData = {}
     for line in cprFile:
@@ -346,7 +346,7 @@ class EBSD:
       except:
         cprData[title][key.lower()] = value.lower()
     cprFile.close()
-    #print "META DATA",cprData
+    # print "META DATA",cprData
     self.stepSizeX = np.double(cprData['job']['griddistx'])
     self.stepSizeY = np.double(cprData['job']['griddisty'])
     xcells         = int(cprData['job']['xcells'])
@@ -359,10 +359,10 @@ class EBSD:
       self.sym.append( Symmetry()        )  #phase 0: default = not identified
       self.sym.append( Symmetry('cubic') )  #phase 1: cubic
     else:
-      print "ERROR: no symmetry found"
+      print("ERROR: no symmetry found")
       return
 
-    #verify that data in correct order
+    # verify that data in correct order
     allColumnNames = [
       'X',                  # 1    4 bytes
       'Y',                  # 2       "
@@ -388,21 +388,21 @@ class EBSD:
         columnNames.append( 'Unknown'+str(order) )
         columnType.append( 4 )
     if columnNames == ['Phase', 'phi1', 'Phi', 'phi2', 'MAD', 'BC', 'BS', 'Bands', 'Error', 'ReliabilityIndex']:
-      print "  CRC-Data in correct order"
+      print("  CRC-Data in correct order")
     else:
-      print "  WARNING! CRC-Data not in correct order! WARNING"
-      print "    should be ['Phase', 'phi1', 'Phi', 'phi2', 'MAD', 'BC', 'BS', 'Bands', 'Error', 'ReliabilityIndex']"
-      print "    is       ",columnNames
-      print "    if data missing at end, no problem"
-    #print columnType
+      print("  WARNING! CRC-Data not in correct order! WARNING")
+      print("    should be ['Phase', 'phi1', 'Phi', 'phi2', 'MAD', 'BC', 'BS', 'Bands', 'Error', 'ReliabilityIndex']")
+      print("    is       ",columnNames)
+      print("    if data missing at end, no problem")
+    # print columnType
 
-    #coordinates
+    # coordinates
     x_ = np.arange(xcells)*self.stepSizeX
     y_ = np.arange(ycells)*self.stepSizeY
     self.x, self.y = np.meshgrid(x_,y_)
     self.x, self.y = self.x.flatten(), self.y.flatten()
 
-    #read data from crcFile
+    # read data from crcFile
     crcFile = open(self.fileName,'rb')
     self.phaseID = np.zeros((numDataPoints),dtype=np.uint8)
     self.BC,self.BS,self.Bands,self.Error=np.zeros_like(self.phaseID),np.zeros_like(self.phaseID),np.zeros_like(self.phaseID),np.zeros_like(self.phaseID)
@@ -423,7 +423,7 @@ class EBSD:
         self.RI[i]      = struct.unpack('f', crcFile.read(4))[0]
     crcFile.close()
     if not len(self.sym) == np.max(self.phaseID)-np.min(self.phaseID)+1:
-      print "ERRRO in reading CRC: symmetries do not match",len(self.sym), np.max(self.phaseID)-np.min(self.phaseID)+1
+      print("ERRRO in reading CRC: symmetries do not match",len(self.sym), np.max(self.phaseID)-np.min(self.phaseID)+1)
     return
 
 
@@ -443,10 +443,10 @@ class EBSD:
         phi1, PHI, phi2 = np.radians(rotation[:3])
         distrib, numPerAxis  = rotation[-2:]
       else:
-        print "ERROR"
+        print("ERROR")
         return
-      print "   Euler angles:",np.round(phi1,2), np.round(PHI,2), np.round(phi2,2),\
-         "| distribution:",distrib,"| numberPerAxis:",numPerAxis
+      print("   Euler angles:",np.round(phi1,2), np.round(PHI,2), np.round(phi2,2),\
+         "| distribution:",distrib,"| numberPerAxis:",numPerAxis)
     else:
       phi1, PHI, phi2 = 0,0,0
     if distrib < 0.001: distrib=0.001
@@ -468,11 +468,11 @@ class EBSD:
     return
 
 
-  #@}
+  # @}
   ##
   # @name Mask and Path routines
   # masked areas are plotted in black. Hence initially no point is part of the mask, i.e. all points are false
-  #@{
+  # @{
 
   def maskCI(self, CI):
     """
@@ -531,7 +531,7 @@ class EBSD:
     if not xmax: xmax=np.max(self.x)
     if not ymin: ymin=0
     if not ymax: ymax=np.max(self.y)
-    #print xmin,xmax,ymin, ymax
+    # print xmin,xmax,ymin, ymax
     self.vMask = np.logical_and(self.vMask,  self.x>=xmin)
     self.vMask = np.logical_and(self.vMask,  self.x<=xmax)
     self.vMask = np.logical_and(self.vMask,  self.y<=ymax)
@@ -540,13 +540,13 @@ class EBSD:
 
 
 
-  #@}
+  # @}
   ##
   # @name PLOT METHODS
-  #@{
+  # @{
 
 
-  def plot(self, vector, widthPixel=None, maximum="", minimum="", interpolationType="nn", cmap=None, show=True, cbar=True):
+  def plot(self, vector, widthPixel=None, maximum="", minimum="", interpolationType="nearest", cmap=None, show=True, cbar=True):
     """
     given a class-vector, plot the vector as an image<br>
     the x and y are given by the class-vector x and y
@@ -556,17 +556,17 @@ class EBSD:
        widthPixel: rescale to horizontal size of the image [default: optimal pixel width]
        maximum: rescale z-scale to maximal value
        minimum: rescale z-scale to minimal value
-       interpolationType: interpolation type [default: "nn" next-neighbor]
+       interpolationType: interpolation type [default: "nearest"]
     """
     startTime = time.time()
     if widthPixel is None:
       widthPixel = int(self.width/self.stepSizeX)
 
-    #create a special cmap palette with blacK as value for bad-numbers
+    # create a special cmap palette with blacK as value for bad-numbers
     if cmap is None:
       cmap = cm.Spectral
       cmap.set_bad('k', 1.0)
-    #create a new grid with the given resolution, and interpolate
+    # create a new grid with the given resolution, and interpolate
     xMax = np.max(self.x[self.vMask])
     xMin = np.min(self.x[self.vMask])
     yMax = np.max(self.y[self.vMask])
@@ -576,26 +576,27 @@ class EBSD:
     xAxis = np.linspace(xMin, xMax, widthPixel)
     yAxis = np.linspace(yMin, yMax, heightPixel)
     x, y = np.meshgrid(xAxis, yAxis)
-    z = mlab.griddata( self.x[self.vMask], self.y[self.vMask], vector[self.vMask],  x,y, interpolationType)
-    mask = mlab.griddata( self.x[self.vMask], self.y[self.vMask], ~self.mask[self.vMask],  x,y, interpolationType)
-    #plot if/if-not the maximum and minimum are given
+    points = np.vstack(  (self.x[self.vMask], self.y[self.vMask]) ).T
+    z    = griddata( points, vector[self.vMask],     (x,y), interpolationType)
+    mask = griddata( points, ~self.mask[self.vMask], (x,y), interpolationType)
+    # plot if/if-not the maximum and minimum are given
     if maximum!="" and minimum!="":
-      plt.imshow( np.ma.masked_where(mask, z) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, vmax=maximum, vmin=minimum, origin='upper')
+      plt.imshow( np.ma.masked_where(mask, z.astype(np.float32)) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, vmax=maximum, vmin=minimum, origin='upper')
     else:
-      plt.imshow( np.ma.masked_where(mask, z) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, origin='upper')
-    maxZ  = np.max(z)
-    self.image  = Image.fromarray( z*255/maxZ )
+      plt.imshow( np.ma.masked_where(mask, z.astype(np.float32)) , extent=[xMin,xMax, yMax,yMin], cmap=cmap, origin='upper')
     if cbar:
       plt.colorbar()
     if self.doctest: plt.savefig('doctest.png'); plt.close(); return
-    print "   Plot with x and y axis in [um]"
-    print "Duration plot: ",int(np.round(time.time()-startTime)),"sec"
+    print("   Plot with x and y axis in [um]")
+    print("Duration plot: ",int(np.round(time.time()-startTime)),"sec")
     if show:
       plt.show()
+    z *= 255/np.max(z)
+    self.image  = Image.fromarray( z.astype(np.float32) )
     return
 
 
-  def plotRGB(self, rgb, widthPixel=256, interpolationType="nn", fileName=None):
+  def plotRGB(self, rgb, widthPixel=256, interpolationType="nearest", fileName=None):
     """
     given a RGB vector (same size as the other class vectors)
     plot the vector as an image<br>
@@ -605,10 +606,10 @@ class EBSD:
     Args:
        rgb: matrix [3, classVectorSize] to be plotted as a 2D image
        widthPixel: horizontal size of the image [default: 256 pixel]
-       interpolationType: interpolation type [default: "nn" next-neighbor]
+       interpolationType: interpolation type [default: "nearest"]
        fileName: save to file instead of showing
     """
-    #create a new grid with the given resolution
+    # create a new grid with the given resolution
     xMax = np.max(self.x[self.vMask])
     xMin = np.min(self.x[self.vMask])
     yMax = np.max(self.y[self.vMask])
@@ -618,32 +619,33 @@ class EBSD:
     xAxis = np.linspace(xMin, xMax,  widthPixel)
     yAxis = np.linspace(yMin, yMax,  heightPixel)
     x, y = np.meshgrid(xAxis, yAxis)
-    #filter out using the mask: assign 0 to the mask on the rgb values
+    # filter out using the mask: assign 0 to the mask on the rgb values
     #  ensure that the left hand right side of = have the same mask
     rgb[0,:][ ~self.mask ] = np.zeros( (len(self.x)) )[ ~self.mask ]
     rgb[1,:][ ~self.mask ] = np.zeros( (len(self.x)) )[ ~self.mask ]
     rgb[2,:][ ~self.mask ] = np.zeros( (len(self.x)) )[ ~self.mask ]
-    #interpolate the rbg onto the red,blue,green
-    red   = np.uint8(mlab.griddata( self.x[self.vMask], self.y[self.vMask], rgb[0,self.vMask],  x,y, interpolationType)*255)
-    green = np.uint8(mlab.griddata( self.x[self.vMask], self.y[self.vMask], rgb[1,self.vMask],   x,y, interpolationType)*255)
-    blue  = np.uint8(mlab.griddata( self.x[self.vMask], self.y[self.vMask], rgb[2,self.vMask],   x,y, interpolationType)*255)
-    #put them all in one array and then reshape it and transpose by changing the order to 0->2->1 (determined by try and error)
+    # interpolate the rbg onto the red,blue,green
+    points = np.vstack(  (self.x[self.vMask], self.y[self.vMask]) ).T
+    red   = np.uint8(griddata( points, rgb[0,self.vMask], (x,y), interpolationType)*255)
+    green = np.uint8(griddata( points, rgb[1,self.vMask], (x,y), interpolationType)*255)
+    blue  = np.uint8(griddata( points, rgb[2,self.vMask], (x,y), interpolationType)*255)
+    # put them all in one array and then reshape it and transpose by changing the order to 0->2->1 (determined by try and error)
     allColors = np.concatenate( (red, green, blue), axis=1)
     imageArray = np.transpose( allColors.reshape(heightPixel, 3, widthPixel), (0,2,1) )
-    #finally plot
+    # finally plot
     self.image  = Image.fromarray( imageArray )
     plt.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
     return
 
 
-  def plotIPF(self, direction="ND", widthPixel=None, fileName=None, interpolationType="nn"):
+  def plotIPF(self, direction="ND", widthPixel=None, fileName=None, interpolationType="nearest"):
     """
     plot Inverse Pole Figure (IPF)
 
     Args:
        direction: default.."ND", "RD", "TD"
        widthPixel: horizontal size of the image [default: optimal size based on data]
-       interpolationType: interpolation type [default: "nn" next-neighbor]
+       interpolationType: interpolation type [default: "nearest"]
        fileName: save to file instead of showing
     """
     startTime = time.time()
@@ -669,7 +671,7 @@ class EBSD:
           flags[~flags] = flags_
     self.plotRGB( rgbs, widthPixel, interpolationType, fileName)
     if self.doctest: plt.savefig('doctest.png'); plt.close(); return
-    print "Duration plotIPF: ",int(np.round(time.time()-startTime)),"sec"
+    print("Duration plotIPF: ",int(np.round(time.time()-startTime)),"sec")
     if fileName == None:
       plt.show()
     else:
@@ -713,15 +715,15 @@ class EBSD:
 
     iClose      = np.argmin((self.x-x)**2 + (self.y-y)**2)
     iQuaternion = self.quaternions[iClose]
-    if not self.doctest: print "Euler angles at point:",iQuaternion.asEulers(degrees=True, round=1)
+    if not self.doctest: print("Euler angles at point:",iQuaternion.asEulers(degrees=True, round=1))
     loc         = np.array([x,y,0])
     for sym in self.sym:
       if sym.__repr__() == None: continue
       for line in sym.unitCell():
         start = iQuaternion*(np.array(line[:3],dtype=np.float)*scale)
         end   = iQuaternion*(np.array(line[3:],dtype=np.float)*scale)
-        #use OIM coordinate system: up-left: new vector (-y, x, z)
-        #use imshow with upper origin: second coordinate negative -> (-y, -x, z)
+        # use OIM coordinate system: up-left: new vector (-y, x, z)
+        # use imshow with upper origin: second coordinate negative -> (-y, -x, z)
         start = np.array([-start[1], -start[0],  start[2]])
         end   = np.array([-end[1],   -end[0],    end[2]])
         # once the orientation of crystal is correct: add location
@@ -742,15 +744,13 @@ class EBSD:
     ax.set_xticks([]); ax.set_yticks([])
     ax.axis('off')
     fig.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
-    #fig.tight_layout()
-    #plt.show()
-    fig.canvas.draw()  # draw the renderer
-    w,h = fig.canvas.get_width_height()
-    buf = np.fromstring ( fig.canvas.tostring_argb(), dtype=np.uint8 )
-    buf.shape = ( w, h,4 ) # Get the RGBA buffer from the figure
-    buf = np.roll( buf, 3, axis = 2 )
-    image = Image.fromstring( "RGBA", (w,h), buf.tostring() )
-    self.image = trim(image)
+    # fig.tight_layout()
+    # plt.show()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    self.image = trim(Image.open(buf)).convert("RGB")
+    buf.close()
     plt.close()
     plt.imshow( self.image, extent=[xMin,xMax, yMax, yMin], origin='upper')
     if self.doctest: plt.savefig('doctest.png'); plt.close(); return
@@ -785,14 +785,14 @@ class EBSD:
     if scale < 0:
       if widthPixel>heightPixel:  scale = widthPixel  / 32
       else:                       scale = heightPixel / 16
-    font = ImageFont.truetype(self.fontFile,scale/5*3)
-    #identify top-left corner of scale bar section
+    font = ImageFont.truetype(self.fontFile,int(scale/5*3)  )
+    # identify top-left corner of scale bar section
     if   site=="BL":  offsetX = 0;                                   offsetY = heightPixel-scale
     elif site=="BR":  offsetX = widthPixel-barPixel-scale/5; offsetY = heightPixel-scale
     elif site=="TL":  offsetX = 0;                                   offsetY = 0
     elif site=="TR":  offsetX = widthPixel-barPixel-scale/5; offsetY = 0
     else:             offsetX = 0;                                   offsetY = heightPixel-scale
-    textString = str(barLength)+" "+u'\u03BC'+"m"
+    textString = str(barLength)+" "+'\u03BC'+"m"
     textWidth, textHeight = draw.textsize( textString, font=font)
     draw.rectangle((offsetX,        offsetY,         offsetX+barPixel+scale/5,  offsetY+scale    ), (255, 255, 255, int(alpha*255)))  #white background
     draw.rectangle((offsetX+scale/10, offsetY+scale*7/10, offsetX+barPixel+scale/10, offsetY+scale*9/10), 'black')    #black bar
@@ -868,8 +868,8 @@ class EBSD:
       imgDim = density+2*size
       img = np.zeros((imgDim,imgDim))
       x,y = np.nan_to_num(x), np.nan_to_num(y)
-      if proj2D=='down-right':   zippedList = zip(-x,y)
-      elif proj2D=='up-left':    zippedList = zip(-y,x)
+      if proj2D=='down-right':   zippedList = list(zip(-x,y))
+      elif proj2D=='up-left':    zippedList = list(zip(-y,x))
       else:                      return
       for x_, y_ in zippedList:
         ix = int((x_ - -1.) * center) + size
@@ -884,17 +884,17 @@ class EBSD:
                 center*np.sin(np.linspace(0,2*np.pi,100))+center+size, 'k-', lw=2)
       plt.plot( [center+size,center+size], [size,imgDim-size], 'k--', lw=1)
       plt.plot( [size,imgDim-size], [center+size,center+size], 'k--', lw=1)
-      #plt.colorbar()
+      # plt.colorbar()
     plt.xlim([-1,1]) ; plt.ylim([-1,1])
     plt.xticks([])   ; plt.yticks([])
     plt.axis('equal'); plt.axis('off')
     if self.doctest: plt.savefig('doctest.png'); plt.close(); return
-    print "Duration plotPF: ",int(np.round(time.time()-startTime)),"sec"
+    print("Duration plotPF: ",int(np.round(time.time()-startTime)),"sec")
     if fileName == None:
       plt.show()
     else:
       plt.savefig(fileName, dpi=150, bbox_inches='tight')
       plt.clf();  plt.cla()
     return
-  #@}
+  # @}
 

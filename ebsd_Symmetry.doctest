@@ -13,7 +13,7 @@ Note: "doctest: +SKIP" implies that the automatic test skips it
 >>> from ebsd_Symmetry import Symmetry
 >>> s = Symmetry('cubic')
 >>> s.inSST( [0.5,0.5,-0.7071], color=True)
-(True, array([ 0.48901787,  0.        ,  1.        ]))
+(True, array([0.48901787, 0.        , 1.        ]))
 >>> s.standardTriangle()                               # doctest: +SKIP
 
 \endverbatim
