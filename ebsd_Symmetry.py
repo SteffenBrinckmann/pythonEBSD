@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 no BOM -*-
-#
+##
 # @file
 # @brief Material symmetry class; this class only stores lattice: cubic, hexagonal
 #
@@ -181,8 +181,8 @@ class Symmetry:
     '''
     Check whether given Rodrigues vector falls into fundamental zone of own symmetry.
     '''
-    if isinstance(R, Quaternion): R = R.asRodrigues()                                               # translate accidentially passed quaternion
-    R = abs(R)                                                                                      # fundamental zone in Rodrigues space is point symmetric around origin
+    if isinstance(R, Quaternion): R = R.asRodrigues()      # translate accidentially passed quaternion
+    R = abs(R)                                             # fundamental zone in Rodrigues space is point symmetric around origin
     if self.lattice == 'cubic':
       return     math.sqrt(2.0)-1.0 >= R[0] \
              and math.sqrt(2.0)-1.0 >= R[1] \

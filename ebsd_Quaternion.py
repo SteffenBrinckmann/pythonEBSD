@@ -1,7 +1,7 @@
-# -*- coding: UTF-8 no BOM -*-
-#
+# -*- coding: utf-8 -*-
+##
 # @file
-# @brief Quaternion: mathematical rotation description
+# @brief Quaternion = mathematical rotation description
 #
 # Part of DAMASK (http:\\damask.mpie.de); Martin Diehl, Philip Eisenlohr, Franz Roters
 # vector versions by Steffen Brinckmann
@@ -31,10 +31,7 @@ class Quaternion:
 
     def __init__(self,
                  quatArray = [1.0,0.0,0.0,0.0]):
-      self.w, \
-      self.x, \
-      self.y, \
-      self.z = quatArray
+      self.w, self.x, self.y, self.z = quatArray
       self.homomorph()
 
 
@@ -50,9 +47,9 @@ class Quaternion:
 
     def __repr__(self):
       if "float" in type(self.w).__name__:
-        return 'Quaternion(real=%+.6f, imag=<%+.6f, %+.6f, %+.6f>)' % (self.w, self.x, self.y, self.z)
+        return 'Q(r=%+.6f, i=<%+.6f, %+.6f, %+.6f>)' % (self.w, self.x, self.y, self.z)
       else:
-        return 'Array of Quaternions of length '+str(len(self.w))
+	      return 'Quaternion array of length '+str(len(self.w))+str(type(self.w))
 
 
     def __ne__(self,other):
@@ -242,10 +239,10 @@ class Quaternion:
 
 
     def __abs__(self):
-      return math.sqrt(self.w ** 2 + \
-                       self.x ** 2 + \
-                       self.y ** 2 + \
-                       self.z ** 2)
+      return np.sqrt(self.w ** 2 + \
+                     self.x ** 2 + \
+                     self.y ** 2 + \
+                     self.z ** 2)
     magnitude = __abs__
 
 
@@ -266,8 +263,15 @@ class Quaternion:
 
     def normalize(self):
       d = self.magnitude()
-      if d > 0.0:
-          self /= d
+      if "float" in type(self.w).__name__:
+        if d > 0.0:
+            self /= d
+      else:
+        mask = d > 0.0
+        self.w[mask] /= d[mask]
+        self.x[mask] /= d[mask]
+        self.y[mask] /= d[mask]
+        self.z[mask] /= d[mask]
       return self
 
 
@@ -338,21 +342,50 @@ class Quaternion:
 
 
     def asAngleAxis(self, degrees = False):
-      if self.w > 1:
-          self.normalize()
-      s = math.sqrt(1. - self.w**2)
-      x = 2*self.w**2 - 1.
-      y = 2*self.w * s
-      angle = math.atan2(y,x)
-      if angle < 0.0:
-        angle *= -1.
-        s     *= -1.
-      return (np.degrees(angle) if degrees else angle,
-              np.array([1.0, 0.0, 0.0] if np.abs(angle) < 1e-6 else [self.x / s, self.y / s, self.z / s]))
+      """
+      Returns: tuple(angle,axis)
+      """
+      if "float" in type(self.w).__name__:
+        if self.w > 1:
+            self.normalize()
+        s = math.sqrt(1. - self.w**2)
+        x = 2*self.w**2 - 1.
+        y = 2*self.w * s
+        angle = math.atan2(y,x)
+        if angle < 0.0:
+          angle *= -1.
+          s     *= -1.
+        return (np.degrees(angle) if degrees else angle,
+                np.array([1.0, 0.0, 0.0] if np.abs(angle) < 1e-6 else [self.x / s, self.y / s, self.z / s]))
+      else:
+        toNorm= np.abs(self.w)>1.0
+        w,x,y,z = self.w.copy()[~toNorm],self.x.copy()[~toNorm],self.y.copy()[~toNorm],self.z.copy()[~toNorm]
+        self.normalized()
+        self.w[~toNorm], self.x[~toNorm], self.y[~toNorm], self.z[~toNorm] = w,x,y,z
+        s = np.sqrt(1. - self.w**2)
+        x = 2*self.w**2 - 1.
+        y = 2*self.w * s
+        angle = np.arctan2(y,x)
+        mask = angle<0.0
+        s[angle<0.0] *= -1.
+        angle[angle<0.0] *= -1.
+        axis = np.vstack((self.x,self.y,self.z))
+        mask = np.abs(angle)<1e-6
+        axis[0,mask]  = 1.
+        axis[1:,mask] = 0.
+        axis[:,~mask]/= s[~mask]
+        return (np.degrees(angle) if degrees else angle, axis)
 
 
     def asRodrigues(self):
-      return np.inf*np.ones(3) if self.w == 0.0 else np.array([self.x, self.y, self.z])/self.w
+      if "float" in type(self.w).__name__:
+        return np.inf*np.ones(3) if self.w == 0.0 else np.array([self.x, self.y, self.z])/self.w
+      else:
+        result = np.vstack((self.x,self.y,self.z))
+        mask   = np.abs(self.w)<1e-6
+        result[:,mask]   = np.inf
+        result[:,~mask] /= self.w[~mask]
+        return result
 
 
     def asEulers(self,

@@ -1,5 +1,5 @@
-# -*- coding: UTF-8 no BOM -*-
-#
+# -*- coding: utf-8 -*-
+##
 # @file
 # @brief Rodrigues representation of rotation
 #
