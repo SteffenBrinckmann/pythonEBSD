@@ -155,35 +155,35 @@ doctest 1
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_ND.bmp"    height=300px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px></td>
-  <td><image src="../HTMLInput/ebsd_py_ND.png"     height=300px></td></tr>
+  <td><image src="HTMLInputStatic/ebsd_OIM_ND.bmp"    height=300px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_ND.png"   height=300px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_ND.png"     height=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_RD.bmp"    height=300px></td>
+  <td><image src="HTMLInputStatic/ebsd_OIM_RD.bmp"    height=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/ebsd_py_RD.png"     height=300px></td></tr>
+  <td><image src="HTMLInputStatic/ebsd_py_RD.png"     height=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_PF001.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF100.png"     height=200px></td></tr>
+  <td><image src="HTMLInputStatic/ebsd_OIM_PF001.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF100.png"     height=200px></td></tr>
 <tr><td><center>PF [100] contour</center> </td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF100Contour.png"     height=200px></td></tr>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF100Contour.png"     height=200px></td></tr>
 <tr><td><center>PF [111]</center> </td>
-  <td><image src="../HTMLInput/ebsd_OIM_PF111.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
-  <td><image src="../HTMLInput/ebsd_py_PF111.png"     height=200px></td></tr>
+  <td><image src="HTMLInputStatic/ebsd_OIM_PF111.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF111.png"     height=200px></td></tr>
 </table>
 
 Issues from mTex:
 <ul>
 <li>.bmp (left): low color number when exporting from external window. .png works (right)<br>
-<image src="../HTMLInput/ebsd_mTex_ND.bmp"   height=300px>
-<image src="../HTMLInput/ebsd_mTex_ND.png"   height=300px>
+<image src="HTMLInputStatic/ebsd_mTex_ND.bmp"   height=300px>
+<image src="HTMLInputStatic/ebsd_mTex_ND.png"   height=300px>
 <li>Explicitly select x-axis as North and z-axis as outOfPlane; normal orientation has different result, although it should be the same<br>
-<image src="../HTMLInput/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
-<image src="../HTMLInput/ebsd_mTex_PF100Contour_org.png"   height=200px>
+<image src="HTMLInputStatic/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
+<image src="HTMLInputStatic/ebsd_mTex_PF100Contour_org.png"   height=200px>
 </ul>
 \endhtmlonly
 
@@ -216,17 +216,17 @@ Load .ang file:  Examples/EBSD.ang
   <td><center>mTex software</center></td>
   <td><center>this python code</center></td></tr>
 <tr><td><center>IPF ND*</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_ND.bmp"    width=300px></td>
-  <td><image src="../HTMLInput/bc_mTex_ND.png"   width=300px></td>
-  <td><image src="../HTMLInput/bc_py_ND.png"     width=300px></td></tr>
+  <td><image src="HTMLInputStatic/bc_OIM_ND.bmp"    width=300px></td>
+  <td><image src="HTMLInputStatic/bc_mTex_ND.png"   width=300px></td>
+  <td><image src="HTMLInputStatic/bc_py_ND.png"     width=300px></td></tr>
 <tr><td><center>IPF RD</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_RD_y.bmp"    width=300px></td>
+  <td><image src="HTMLInputStatic/bc_OIM_RD_y.bmp"    width=300px></td>
   <td><center>I cannot produce</center></td>
-  <td><image src="../HTMLInput/bc_py_RD.png"     width=300px></td></tr>
+  <td><image src="HTMLInputStatic/bc_py_RD.png"     width=300px></td></tr>
 <tr><td><center>PF [100]</center> </td>
-  <td><image src="../HTMLInput/bc_OIM_PF.bmp"    height=200px></td>
-  <td><image src="../HTMLInput/bc_mTex_PF.png"   height=200px></td>
-  <td><image src="../HTMLInput/bc_py_PF.png"     height=200px></td></tr>
+  <td><image src="HTMLInputStatic/bc_OIM_PF.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/bc_mTex_PF.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/bc_py_PF.png"     height=200px></td></tr>
 </table>
 \endhtmlonly
 
