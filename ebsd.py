@@ -71,11 +71,11 @@ class EBSD:
     if self.stepSizeY is None: self.stepSizeY=self.stepSizeX
     if self.stepSizeX<0.00001 and self.stepSizeY>0.00001:
       self.stepSizeX = self.stepSizeY
-    print "   Read file with step size:",self.stepSizeX, self.stepSizeY
-    print "   Optimal image pixel size:",int(self.width/self.stepSizeX)
-    print "   Number of points:",len(self.x)
+    print ("   Read file with step size:",self.stepSizeX, self.stepSizeY)
+    print ("   Optimal image pixel size:",int(self.width/self.stepSizeX))
+    print ("   Number of points:",len(self.x))
     if np.max(self.x)>10000.0 or np.max(self.y)>10000.0 :
-      print "Error in reading in ebsd.py (possibly latest version of .osc)"
+      print ("Error in reading in ebsd.py (possibly latest version of .osc)")
       return
 
     # convert into quaternions and only use that
@@ -92,10 +92,6 @@ class EBSD:
       print("   Duration init: ", int(np.round(time.time()-startTime)), "sec")
     return
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 67c4e0204c46a987a2d707aaedb7e6bfb4f89094
   def loadANG(self, fileName=None):
     """
     Load .ang file: filename saved in self. No need to use it
@@ -576,7 +572,7 @@ class EBSD:
     elif layers==2:
       neighbors = np.array([-l-1,-l,-l+1,-l+2,  -2,-1,+1,+2,  +l-2,+l-1,+l,+l+1])+idx
     else:
-      print "number of layers not implemented"
+      print("number of layers not implemented")
       return None
     neighbors[neighbors<0]            = -10
     neighbors[neighbors>=len(self.x)] = -10
@@ -621,7 +617,7 @@ class EBSD:
         if np.all(foundAngle): break   #stop looking for alternatives if filled already all
     self.kam = np.degrees( np.nanmean(angles, axis=1) )
     self.kam[ self.CI==-1.0 ] = np.nan
-    print "Duration KAM evaluation: ",int(np.round(time.time()-startTime)),"sec"
+    print("Duration KAM evaluation: ",int(np.round(time.time()-startTime)),"sec")
     return
 
 

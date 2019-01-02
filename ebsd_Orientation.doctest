@@ -6,7 +6,7 @@ Orientation class: An orientation is combination of material symmetry (e.g. cubi
 
 Note: "doctest: +SKIP" implies that the automatic test skips it
 
-\section tutorials Tutorials
+\section tutorialsOrientation Tutorials
 
 \subsection exampleColors Example: check colors of certain orientations. Answers are given in RGB scale.
 Three examples are investigated:
@@ -65,7 +65,7 @@ array([0., 0., 1.])
 
 \endverbatim
 
-\subsection example1b Compare to OIM Software
+\subsection exampleOrientation1b Compare to OIM Software
 OIM software shows the 2D projection with the RD upward. Note, many textbooks have the RD downward. ND is always pointing out of the plane; TD changes depending on RD
 \verbatim
 >>> o = Orientation(Eulers=np.radians([0,10,10]), symmetry="cubic")
@@ -92,7 +92,7 @@ The HKL and UVW vectors are rounded to integer, hence rough values. They are con
 
 
 
-\subsection example3 Example: loop through all equivalent directions and calculate the directions
+\subsection exampleOrientation3 Example: loop through all equivalent directions and calculate the directions
 \verbatim
 >>> o = Orientation(Eulers=np.radians([0,45,0]), symmetry="cubic")
 >>> oHelp = Orientation(Eulers=np.array([0.,0.,0.]), symmetry="cubic")   #find equivalent directions
@@ -127,7 +127,7 @@ The HKL and UVW vectors are rounded to integer, hence rough values. They are con
 
 \endverbatim
 
-\subsection example3 Example: calculate average orientation
+\subsection exampleOrientation4 Example: calculate average orientation
 \verbatim
 >>> a = Orientation(Eulers=np.radians([0,45,0]), symmetry='cubic')
 >>> b = Orientation(Eulers=np.radians([0,0,0]), symmetry='cubic')
