@@ -43,8 +43,8 @@ if __name__ == "__main__":
   if noFailure:
     message = input("Enter github message? [empty: no commit] ")
     if message != "":
-      gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\n"
-      gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n"
+      gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\nHTMLInputDynamic/\nBackup/\n"
+      gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\nHTMLInputDynamic/\nBackup/\n"
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreRemote)
       os.system("git add -A")
@@ -52,7 +52,11 @@ if __name__ == "__main__":
       os.system('git push -u origin master')
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreLocal)
+      os.system("git rm -r --cached .")
+      os.system("git add .")
+      os.system('git commit -m ".gitignore fix"')
 
+      
 
 def doctestImage(fileName):
   orgFile = "doctestImages/"+fileName+".png"
