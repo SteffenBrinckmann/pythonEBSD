@@ -625,7 +625,7 @@ class EBSD:
   ##
   # @name PLOT METHODS
   #@{
-  def plot(self, vector, widthPixel=None, vmax="", vmin="", interpolationType="nn", cmap=None, show=True, cbar=True):
+  def plot(self, vector, widthPixel=None, vmax="", vmin="", interpolationType="nearest", cmap=None, show=True, cbar=True):
     """
     given a class-vector, plot the vector as an image<br>
     the x and y are given by the class-vector x and y
@@ -635,7 +635,7 @@ class EBSD:
        widthPixel: rescale to horizontal size of the image [default: optimal pixel width]
        vmax: rescale z-scale to maximal value
        vmin: rescale z-scale to minimal value
-       interpolationType: interpolation type [default: "nn" next-neighbor]
+       interpolationType: interpolation type [default: "nearest" next-neighbor]
     """
     startTime = time.time()
     if widthPixel is None:

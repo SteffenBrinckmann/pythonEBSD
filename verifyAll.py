@@ -9,7 +9,7 @@ if __name__ == "__main__":
   noFailure = True
   for fileName in os.listdir("."):
     if fileName.endswith(".doctest"):
-      if len(sys.argv)==0:
+      if len(sys.argv)==1 or sys.argv[1]=="skipDoctest":
         result = doctest.testfile(fileName)  #, optionflags=doctest.REPORT_ONLY_FIRST_FAILURE)
         print(("%-30s %-30s"%(fileName,result,)))
         if result.failed>0:
@@ -59,7 +59,7 @@ if __name__ == "__main__":
       
 
 def doctestImage(fileName):
-  orgFile = "doctestImages/"+fileName+".png"
+  orgFile = "HTMLInputDynamic/"+fileName+".png"
   if os.path.exists(orgFile):
     md5New = hashlib.md5(open("doctest.png","rb").read()).hexdigest()
     md5Org = hashlib.md5(open(orgFile,"rb").read()).hexdigest()
