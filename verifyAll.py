@@ -91,3 +91,10 @@ def doctestImage(fileName):
       shutil.copy("doctest.png", orgFile)
       print("doctest 1")
   return
+
+
+""" 
+mv HTMLInputDynamic/ HTMLInputDynamic_TEMP
+mkdir HTMLInputDynamic
+cat > HTMLInputDynamic/empty.txt
+"""
