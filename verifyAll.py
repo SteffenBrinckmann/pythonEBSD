@@ -4,6 +4,7 @@ import doctest, os, shutil, hashlib, sys
 from distutils import dir_util
 import matplotlib.pyplot as plt
 from PIL import Image
+#from git import Repo
 
 if __name__ == "__main__":
   noFailure = True
@@ -32,44 +33,68 @@ if __name__ == "__main__":
 
   if os.path.exists('doxygenOutput.txt'):
     os.unlink("doxygenOutput.txt")
-  dir_util.copy_tree("HTMLInputStatic","docs/HTMLInputStatic")
-  dir_util.copy_tree("HTMLInputDynamic","docs/HTMLInputDynamic")
-  os.system("doxygen")
-  os.system("rm *.doxy")
   if os.path.exists('doctest.png'):
     os.unlink('doctest.png')
 
   #commit to github
+  doGIT = False
   if noFailure:
     message = input("Enter github message? [empty: no commit] ")
     if message != "":
-      gitignoreMaster = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n\n.vscode/\ndocs/\nHTMLInputDynamic_TEMP/\nHTMLInputDynamic/*.png\nBackupEBSD/\n"
-      gitignoreGHPages= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n*.py\n*.doctest\nDoxyfile\narial.ttf\n\n.vscode/\nHTMLInputDynamic/\nHTMLInputStatic/\nExamples/\nBackupEBSD/\n"
+      doGIT = True
+  if doGIT:
+    # master
+    os.system("git add .")
+    os.system('git commit -m "'+message+'"')
+    os.system('git push -u origin master')
+    #gh-pages
+    shutil.rmtree("docs")
+    os.mkdir("docs")
+    os.chdir("docs")
+    os.system('git clone https://github.com/SteffenBrinckmann/pythonEBSD.git .')
+    os.system('git checkout --orphan gh-pages')
+    os.system('git rm -rf .')
 
-      #Master branch
-      # with open(".gitignore", "w") as fout:
-      #   fout.write(gitignoreMaster)
-      # os.system("git rm -r --cached .")
-      os.system("git add .")
-      os.system('git commit -m "'+message+'"')
-      os.system('git push -u origin master')
+  # create HTML
+  dir_util.copy_tree("HTMLInputStatic","docs/HTMLInputStatic")
+  dir_util.copy_tree("HTMLInputDynamic","docs/HTMLInputDynamic")
+  os.system("doxygen")
+  os.system("rm *.doxy")
+
+  # upload ghpages
+  if doGIT:
+    os.system("git add .")
+    os.system('git commit -m "docs build"')
+    os.system('git push -f origin gh-pages')
+    shutil.rmtree(".git")
+    os.chdir("..")
+    os.system('git checkout master')
 
       #GH-pages branch
-      # os.system('git checkout -b gh-pages')
-      # with open(".gitignore", "w") as fout:
-      #   fout.write(gitignoreGHPages)
-      # shutil.rmtree("HTMLInputDynamic")
-      # shutil.move("HTMLInputDynamic_TEMP","HTMLInputDynamic")
-      # os.system("git rm -r --cached .")
-      # os.system("git add .")
-      # os.system('git commit -m "gh-pages"')
-      # os.system('git push -f origin gh-pages')
+      """
+      r = Repo(".")
+      ghPages = r.create_head("gh-pages")
+      if (r.active_branch != ghPages):
+         print("EVERYTHING OK")
+      else:
+        print("PROBLEM")
+      ghPages.checkout()
+      if (r.active_branch == ghPages):
+         print("EVERYTHING OK")
+      else:
+        print("PROBLEM")
 
-      #Back to master
-      # with open(".gitignore", "w") as fout:
-      #   fout.write(gitignoreMaster)
-      # os.system("git checkout -f master")
-      # os.system("git branch -D gh-pages")
+      r.active_branch != ghPages
+      b = r.branches[0]
+      ri = r.index
+      ri.add?
+      ri.commit?
+      o  = r.remotes[0]
+      o.exists()
+      ri.add(".")
+      ri = r.index
+      ri.commit?
+      """
 
 
 def doctestImage(fileName):
