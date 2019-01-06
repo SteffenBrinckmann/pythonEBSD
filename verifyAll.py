@@ -62,7 +62,7 @@ if __name__ == "__main__":
       os.system('git checkout -b gh-pages')
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreGHPages)
-      os.system("mv HTMLInputDynamic_TEMP/ HTMLInputDynamic")
+      os.system("mv HTMLInputDynamic_TEMP HTMLInputDynamic")
       os.system("git rm -r --cached .")
       os.system("git add .")
       os.system('git commit -m "gh-pages"')
