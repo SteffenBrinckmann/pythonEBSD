@@ -49,7 +49,7 @@ if __name__ == "__main__":
       #Master branch
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreMaster)
-      os.system("mv HTMLInputDynamic/ HTMLInputDynamic_TEMP")
+      os.system("mv HTMLInputDynamic HTMLInputDynamic_TEMP")
       os.system("mkdir HTMLInputDynamic")
       with open("HTMLInputDynamic/empty.txt", "w") as fout:
         fout.write("")
