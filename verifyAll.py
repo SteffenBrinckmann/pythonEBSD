@@ -43,20 +43,37 @@ if __name__ == "__main__":
   if noFailure:
     message = input("Enter github message? [empty: no commit] ")
     if message != "":
-      gitignoreLocal = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\ndocs/\nHTMLInputDynamic/\nBackup/\n"
-      gitignoreRemote= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\nHTMLInputDynamic/\nBackup/\n"
+      gitignoreMaster = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n\n.vscode/\ndocs/\nHTMLInputDynamic_TEMP/\nBackupEBSD/\n"
+      gitignoreGHPages= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n*.py\n*.doctest\nDoxyfile\narial.ttf\n\n.vscode/\nHTMLInputDynamic/\nHTMLInputStatic/\nExamples/\nBackupEBSD/\n"
+
+      #Master branch
       with open(".gitignore", "w") as fout:
-        fout.write(gitignoreRemote)
-      os.system("git add -A")
-      os.system('git commit -m "'+message+'"')
-      os.system('git push -u origin master')
-      with open(".gitignore", "w") as fout:
-        fout.write(gitignoreLocal)
+        fout.write(gitignoreMaster)
+      os.system("mv HTMLInputDynamic/ HTMLInputDynamic_TEMP")
+      os.system("mkdir HTMLInputDynamic")
+      with open("HTMLInputDynamic/empty.txt", "w") as fout:
+        fout.write("")
       os.system("git rm -r --cached .")
       os.system("git add .")
-      os.system('git commit -m ".gitignore fix"')
+      os.system('git commit -m "'+message+'"')
+      os.system('git push -u origin master')
 
-      
+      #GH-pages branch
+      os.system('git checkout -b gh-pages')
+      with open(".gitignore", "w") as fout:
+        fout.write(gitignoreGHPages)
+      os.system("mv HTMLInputDynamic_TEMP/ HTMLInputDynamic")
+      os.system("git rm -r --cached .")
+      os.system("git add .")
+      os.system('git commit -m "gh-pages"')
+      os.system('git push origin gh-pages')
+
+      #Back to master
+      with open(".gitignore", "w") as fout:
+        fout.write(gitignoreMaster)
+      os.system("git checkout master")
+      os.system("git branch -D gh-pages")
+
 
 def doctestImage(fileName):
   orgFile = "HTMLInputDynamic/"+fileName+".png"
@@ -91,10 +108,3 @@ def doctestImage(fileName):
       shutil.copy("doctest.png", orgFile)
       print("doctest 1")
   return
-
-
-""" 
-mv HTMLInputDynamic/ HTMLInputDynamic_TEMP
-mkdir HTMLInputDynamic
-cat > HTMLInputDynamic/empty.txt
-"""
