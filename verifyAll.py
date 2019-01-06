@@ -43,7 +43,7 @@ if __name__ == "__main__":
   if noFailure:
     message = input("Enter github message? [empty: no commit] ")
     if message != "":
-      gitignoreMaster = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n\n.vscode/\ndocs/\nHTMLInputDynamic_TEMP/\nBackupEBSD/\n"
+      gitignoreMaster = ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n\n.vscode/\ndocs/\nHTMLInputDynamic_TEMP/\nHTMLInputDynamic/*.png\nBackupEBSD/\n"
       gitignoreGHPages= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n*.py\n*.doctest\nDoxyfile\narial.ttf\n\n.vscode/\nHTMLInputDynamic/\nHTMLInputStatic/\nExamples/\nBackupEBSD/\n"
 
       #Master branch
@@ -62,16 +62,17 @@ if __name__ == "__main__":
       os.system('git checkout -b gh-pages')
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreGHPages)
+      os.system("rm -r HTMLInputDynamic")
       os.system("mv HTMLInputDynamic_TEMP HTMLInputDynamic")
       os.system("git rm -r --cached .")
       os.system("git add .")
       os.system('git commit -m "gh-pages"')
-      os.system('git push origin gh-pages')
+      os.system('git push -f origin gh-pages')
 
       #Back to master
       with open(".gitignore", "w") as fout:
         fout.write(gitignoreMaster)
-      os.system("git checkout master")
+      os.system("git checkout -f master")
       os.system("git branch -D gh-pages")
 
 
