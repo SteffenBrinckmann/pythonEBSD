@@ -47,33 +47,29 @@ if __name__ == "__main__":
       gitignoreGHPages= ".directory\n.gitignore\ndoxygenOutput.txt\n*.pyc\n*.py\n*.doctest\nDoxyfile\narial.ttf\n\n.vscode/\nHTMLInputDynamic/\nHTMLInputStatic/\nExamples/\nBackupEBSD/\n"
 
       #Master branch
-      with open(".gitignore", "w") as fout:
-        fout.write(gitignoreMaster)
-      os.system("mv HTMLInputDynamic HTMLInputDynamic_TEMP")
-      os.system("mkdir HTMLInputDynamic")
-      with open("HTMLInputDynamic/empty.txt", "w") as fout:
-        fout.write("")
-      os.system("git rm -r --cached .")
+      # with open(".gitignore", "w") as fout:
+      #   fout.write(gitignoreMaster)
+      # os.system("git rm -r --cached .")
       os.system("git add .")
       os.system('git commit -m "'+message+'"')
       os.system('git push -u origin master')
 
       #GH-pages branch
-      os.system('git checkout -b gh-pages')
-      with open(".gitignore", "w") as fout:
-        fout.write(gitignoreGHPages)
-      os.system("rm -r HTMLInputDynamic")
-      os.system("mv HTMLInputDynamic_TEMP HTMLInputDynamic")
-      os.system("git rm -r --cached .")
-      os.system("git add .")
-      os.system('git commit -m "gh-pages"')
-      os.system('git push -f origin gh-pages')
+      # os.system('git checkout -b gh-pages')
+      # with open(".gitignore", "w") as fout:
+      #   fout.write(gitignoreGHPages)
+      # shutil.rmtree("HTMLInputDynamic")
+      # shutil.move("HTMLInputDynamic_TEMP","HTMLInputDynamic")
+      # os.system("git rm -r --cached .")
+      # os.system("git add .")
+      # os.system('git commit -m "gh-pages"')
+      # os.system('git push -f origin gh-pages')
 
       #Back to master
-      with open(".gitignore", "w") as fout:
-        fout.write(gitignoreMaster)
-      os.system("git checkout -f master")
-      os.system("git branch -D gh-pages")
+      # with open(".gitignore", "w") as fout:
+      #   fout.write(gitignoreMaster)
+      # os.system("git checkout -f master")
+      # os.system("git branch -D gh-pages")
 
 
 def doctestImage(fileName):
