@@ -4,13 +4,13 @@ import doctest, os, shutil, hashlib, sys
 from distutils import dir_util
 import matplotlib.pyplot as plt
 from PIL import Image
-#from git import Repo
+#from git import Repo: not practicle, since does not allow "git add" using git ignore
 
 if __name__ == "__main__":
   noFailure = True
   for fileName in os.listdir("."):
     if fileName.endswith(".doctest"):
-      if len(sys.argv)==1 or sys.argv[1]=="skipDoctest":
+      if len(sys.argv)!=1 or sys.argv[1]!="skipDoctest":
         result = doctest.testfile(fileName)  #, optionflags=doctest.REPORT_ONLY_FIRST_FAILURE)
         print(("%-30s %-30s"%(fileName,result,)))
         if result.failed>0:
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     os.system('git clone https://github.com/SteffenBrinckmann/pythonEBSD.git .')
     os.system('git checkout --orphan gh-pages')
     os.system('git rm -rf .')
+    os.chdir("..")
 
   # create HTML
   dir_util.copy_tree("HTMLInputStatic","docs/HTMLInputStatic")
@@ -63,38 +64,12 @@ if __name__ == "__main__":
 
   # upload ghpages
   if doGIT:
+    os.chdir("docs")
     os.system("git add .")
     os.system('git commit -m "docs build"')
     os.system('git push -f origin gh-pages')
     shutil.rmtree(".git")
     os.chdir("..")
-    os.system('git checkout master')
-
-      #GH-pages branch
-      """
-      r = Repo(".")
-      ghPages = r.create_head("gh-pages")
-      if (r.active_branch != ghPages):
-         print("EVERYTHING OK")
-      else:
-        print("PROBLEM")
-      ghPages.checkout()
-      if (r.active_branch == ghPages):
-         print("EVERYTHING OK")
-      else:
-        print("PROBLEM")
-
-      r.active_branch != ghPages
-      b = r.branches[0]
-      ri = r.index
-      ri.add?
-      ri.commit?
-      o  = r.remotes[0]
-      o.exists()
-      ri.add(".")
-      ri = r.index
-      ri.commit?
-      """
 
 
 def doctestImage(fileName):
