@@ -10,7 +10,7 @@ if __name__ == "__main__":
   noFailure = True
   for fileName in os.listdir("."):
     if fileName.endswith(".doctest"):
-      if len(sys.argv)!=1 or sys.argv[1]!="skipDoctest":
+      if len(sys.argv)==1 or sys.argv[1]!="skipDoctest":
         result = doctest.testfile(fileName)  #, optionflags=doctest.REPORT_ONLY_FIRST_FAILURE)
         print(("%-30s %-30s"%(fileName,result,)))
         if result.failed>0:
