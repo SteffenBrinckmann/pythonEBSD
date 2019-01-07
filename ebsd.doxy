@@ -1,0 +1,303 @@
+/** \file
+\brief Tutorials for ebsd
+
+\section tutorials Tutorials
+
+\subsection example1 Example: Read EBSD data and plot the ND IPF
+- plot confidence index (CI). Mask out all points with a CI less than 0.1. Initially all points are present in the mask, i.e. they are shown. By masking out points, these are removed from the mask.
+- plot inverse pole figure in normal direction
+- play with different options (1024pixel to see speed of plotting)
+- setVMask: for fast plotting;
+- pole figure (PF) in the [1,0,0] direction. The OIM software has the top left corner has coordinate origin
+
+\verbatim
+>>> from ebsd import EBSD
+>>> e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> e.plot(e.CI)
+\endverbatim
+\image html ebsd_1.png width=40%
+\verbatim>>> e.maskCI( 0.1 )
+>>> e.plot( e.CI )
+\endverbatim
+\image html ebsd_2.png width=40%
+\verbatim>>> e.plotIPF()
+\endverbatim
+\image html ebsd_3.png width=40%
+\verbatim>>> e.plotIPF(1024)
+\endverbatim
+\image html ebsd_4.png width=40%
+\verbatim>>> e.addScaleBar()
+\endverbatim
+\image html ebsd_5.png width=40%
+\verbatim>>> e.setVMask(4)                          # use only every 4th point, increases plotting speed
+>>> e.plotIPF(1024)
+\endverbatim
+\image html ebsd_6.png width=40%
+\verbatim>>> e.cropVMask(0,0,10,10)               # show only a section of the image, increases plotting speed
+>>> e.plotIPF(1024)
+\endverbatim
+\image html ebsd_7.png width=40%
+\verbatim>>> e.plotPF([1,0,0])
+\endverbatim
+\image html ebsd_8.png width=40%
+\verbatim>>> e.plotPF([1,0,0],points=True)
+\endverbatim
+\image html ebsd_9.png width=40%
+\verbatim
+\endverbatim
+
+\image html ebsd_py_ND.png
+
+
+\subsection example2 Example: Interaction with OIM Software to update grain information from different file
+How to export txt-file from OIM that can be read:
+  - Partition->export-> grain file -> use "grain file type 1" (saves a txt file)
+  - Partition->export-> partition data -> save as .ang
+
+Warning: This is example input file does not exist, anymore. Not tested
+\verbatim
+> e = EBSD("Examples/Test.ang")
+> e.loadTXT("Examples/TestB.txt")
+> e.maskCI(0.1)
+> e.removePointsOfMask()
+> e.writeANG("ebsd.ang")
+
+\endverbatim
+Which can then be read in OIM again
+
+
+
+\subsection example3 Compare with OIM software and verify pole-figure
+\verbatim
+>>> import numpy as np
+>>> from ebsd import EBSD
+>>> from ebsd_Orientation import Orientation
+>>> e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> e.maskCI( 0.001 )
+>>> e.plotIPF('ND')                        
+>>> e.cropVMask(xmin=18,ymin=12,ymax=17)
+>>> e.plotIPF('ND')                        
+
+\endverbatim
+Inspect the original data at x,y = 20.1,14.38 um <br>
+line 8785 from EBSD.ang <br>
+5.55763   2.18448   3.83349     20.10000     14.37602 3653.496  0.482  0      1  1.104 <br>
+\verbatim
+>>> print (np.degrees([ 5.55763, 2.18448, 3.83349]))
+[318.4287431  125.16148443 219.64279781]
+>>> e.cropVMask(xmin=20,xmax=20.2,ymin=14.3,ymax=14.4)
+>>> e.y[e.vMask]                           #verify y: correct if rounding accounted for
+array([14.37602])
+>>> angle = e.quaternions[e.vMask].asEulers().flatten()
+>>> print (np.round(np.degrees(angle)))                #convert to only positive values
+[ -42.  125. -140.]
+>>> print (np.round(np.degrees(angle)+np.array([360,0,360])))
+[318. 125. 220.]
+
+\endverbatim
+Plot correct unit cells and pole-figures using the orientation-class
+\verbatim
+>>> o = Orientation(Eulers=angle, symmetry="cubic")
+>>> o.toScreen()                                   #first item is one looking for 
+>>> o.plot(plot2D='up-left')
+\endverbatim
+\image html ebsd_10.png width=40%
+\verbatim>>> o.plot(poles=[1,0,0],plot2D='up-left',scale=1.5)
+\endverbatim
+\image html ebsd_11.png width=40%
+\verbatim
+\endverbatim
+Create artificial ebsd pattern to check PF
+\verbatim
+>>> e = EBSD('void318.|125.|219.6|0|2')
+Void mode 318.|125.|219.6|0|2
+   Euler angles: 5.55 2.18 3.83 | distribution: 0.0 | numberPerAxis: 2.0
+   Read file with step size: 1.0 1.0
+   Optimal image pixel size: 1
+   Number of points: 4
+>>> e.plotPF(size=5)
+\endverbatim
+\image html ebsd_12.png width=40%
+\verbatim>>> e.plotPF(points=True)
+\endverbatim
+\image html ebsd_13.png width=40%
+\verbatim
+\endverbatim
+Finally, inspect pole-figure of data and compare OIM software, mTex and this python code
+\verbatim
+>>> e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> e.maskCI( 0.001 )
+>>> e.plotPF(size=1)                       
+>>> e.plotPF()                 
+>>> e.plotPF(proj2D='down-right')
+\endverbatim
+\image html ebsd_14.png width=40%
+\verbatim
+\endverbatim
+\htmlonly
+<table border=1>
+<tr><td><center>description</center></td>
+  <td><center>OIM software</center></td>
+  <td><center>mTex software</center></td>
+  <td><center>this python code</center></td></tr>
+<tr><td><center>IPF ND*</center> </td>
+  <td><image src="HTMLInputStatic/ebsd_OIM_ND.bmp"    height=300px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_ND.png"   height=300px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_ND.png"     height=300px></td></tr>
+<tr><td><center>IPF RD</center> </td>
+  <td><image src="HTMLInputStatic/ebsd_OIM_RD.bmp"    height=300px></td>
+  <td><center>I cannot produce</center></td>
+  <td><image src="HTMLInputStatic/ebsd_py_RD.png"     height=300px></td></tr>
+<tr><td><center>PF [100]</center> </td>
+  <td><image src="HTMLInputStatic/ebsd_OIM_PF001.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF100_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF100.png"     height=200px></td></tr>
+<tr><td><center>PF [100] contour</center> </td>
+  <td><center>I cannot produce</center></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF100Contour.png"     height=200px></td></tr>
+<tr><td><center>PF [111]</center> </td>
+  <td><image src="HTMLInputStatic/ebsd_OIM_PF111.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_mTex_PF111_xNorthzOutOfPlane.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/ebsd_py_PF111.png"     height=200px></td></tr>
+</table>
+
+Issues from mTex:
+<ul>
+<li>.bmp (left): low color number when exporting from external window. .png works (right)<br>
+<image src="HTMLInputStatic/ebsd_mTex_ND.bmp"   height=300px>
+<image src="HTMLInputStatic/ebsd_mTex_ND.png"   height=300px>
+<li>Explicitly select x-axis as North and z-axis as outOfPlane; normal orientation has different result, although it should be the same<br>
+<image src="HTMLInputStatic/ebsd_mTex_PF100Contour_xNorthzOutOfPlane.png"   height=200px>
+<image src="HTMLInputStatic/ebsd_mTex_PF100Contour_org.png"   height=200px>
+</ul>
+\endhtmlonly
+
+
+\subsection example4 Average orientation in file, does not make sence for this multi-grain case
+averaging takes lots of time: Orientation.average()
+\verbatim
+>>> from ebsd_Orientation import Orientation
+>>> from ebsd import EBSD
+>>> Orients = []
+>>> e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> for i in range(len(e.x)):
+...   Orients.append(Orientation(quaternion=e.quaternions[i], symmetry="cubic"))
+>>> avg = Orientation.average( Orients)
+>>> print ("Average orientation",np.round(avg.asEulers(degrees=True, standardRange=True),0)) 
+
+\endverbatim
+
+
+
+\subsection compare Compare the three software for bicrystal
+\htmlonly
+<table border=1>
+<tr><td><center>description</center></td>
+  <td><center>OIM software</center></td>
+  <td><center>mTex software</center></td>
+  <td><center>this python code</center></td></tr>
+<tr><td><center>IPF ND*</center> </td>
+  <td><image src="HTMLInputStatic/bc_OIM_ND.bmp"    width=300px></td>
+  <td><image src="HTMLInputStatic/bc_mTex_ND.png"   width=300px></td>
+  <td><image src="HTMLInputStatic/bc_py_ND.png"     width=300px></td></tr>
+<tr><td><center>IPF RD</center> </td>
+  <td><image src="HTMLInputStatic/bc_OIM_RD_y.bmp"    width=300px></td>
+  <td><center>I cannot produce</center></td>
+  <td><image src="HTMLInputStatic/bc_py_RD.png"     width=300px></td></tr>
+<tr><td><center>PF [100]</center> </td>
+  <td><image src="HTMLInputStatic/bc_OIM_PF.bmp"    height=200px></td>
+  <td><image src="HTMLInputStatic/bc_mTex_PF.png"   height=200px></td>
+  <td><image src="HTMLInputStatic/bc_py_PF.png"     height=200px></td></tr>
+</table>
+\endhtmlonly
+
+Python code
+\verbatim
+>>> from ebsd import EBSD
+>>> e = EBSD("Examples/EBSD.ang")
+Load .ang file:  Examples/EBSD.ang
+   Read file with step size: 0.2 0.2
+   Optimal image pixel size: 103
+   Number of points: 23909
+>>> e.cropVMask(ymin=35)
+>>> e.addSymbol(5,37, scale=2)
+\endverbatim
+\image html ebsd_16.png width=40%
+\verbatim>>> e.plotIPF("RD",fileName="pythonRD.png")
+>>> e.addSymbol(5,37, scale=2)
+>>> e.addSymbol(18,37, scale=2,fileName="pythonRD.png")
+\endverbatim
+\image html ebsd_17.png width=40%
+\verbatim>>> e.plotIPF("TD",fileName="pythonTD.png")
+>>> e.addSymbol(5,37, scale=2)
+>>> e.addSymbol(18,37, scale=2,fileName="pythonTD.png")
+\endverbatim
+\image html ebsd_18.png width=40%
+\verbatim>>> e.plotPF(      fileName="pythonPF.png")
+
+\endverbatim
+please, note, the last image is not colored. This is not implemented yet. TODO
+
+\section mTex how to run mTex
+\verbatim
+>> startup_mtex
+>> import_wizard('ebsd')
+% and select EBSD.osc
+% select plotting convention 5: x-to-right; y-to-bottom
+% select "convert Euler 2 Spacial Referecence Frame"
+% save to workspace variable
+>> csCopper = ebsd('Cu').CS;
+>> plot(ebsd('Cu'),ebsd('Cu').orientations,'coordinates','on')
+>> cS = crystalShape.cube(ebsd.CS)
+>> region = [0 35 50 50];
+>> ebsdC  = ebsd(inpolygon(ebsd,region))
+>> plot(ebsdC('Cu'),ebsdC('Cu').orientations,'coordinates','on')
+>> plotPDF(ebsd('Cu').orientations, Miller({1 0 0},csCopper))
+% select xNorth zOutOfPlane as axis in mTex
+>> plotPDF(ebsd('Cu').orientations, Miller({1 1 1},csCopper))
+>> odf = calcODF(ebsd('Cu').orientations)
+>> plotPDF(odf,Miller({1 0 0},csCopper) )
+\endverbatim
+
+If separate window: save as png, because bmp colorscale is broken
+- if not separet window: save as bmp, because png crops sections off
+select xNorth zOutOfPlane as axis in mTex
+- compare to original which should be the same
+
+\section data Data that exists and can be used for plotting in plot:
+- OIM software:
+  - e.phi1, e.PHI, e.phi2 : Euler angles saved as quaternions
+  - e.x, e.y : x,y coordinates
+  - e.IQ, e.CI, e.phaseID : Image Quality, confidence index (bad=0 ... good=1) , phase id
+  - e.SEMsignal : SEM signal
+  - e.fit :
+- Oxford:
+  - bc: band contrast
+
+\section developerHints Hints for developers
+- run ./verifyAll.py after all changes to verify the code and create the html-documentation
+- git commands
+    - git add -A
+    - git gui
+    - git commit -m "solved symbolic link issue"
+    - git push -u origin master
+
+
+*/

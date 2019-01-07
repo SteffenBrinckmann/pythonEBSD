@@ -1,0 +1,42 @@
+/** \file
+ *  \brief General information, start-up page
+    \page main General information, start-up page
+    \tableofcontents
+\mainpage EBSD python code
+
+\section authors_sec Author
+Steffen Brinckmann<br>
+
+\section features Features:
+  - File formats accepted .ang | .osc | .crc | .txt
+  - can write .ang for FCC. Others could be added
+  - fast plotting interaction using virtual mask (only used for plotting)
+    - increases speed in intermediate test plots
+    - even though some interpolation and reading takes time
+    - can be removed just before final plotting
+  - verified with the OIM software and mTex
+  - heavily tested for cubic
+  - separate crystal orientation and plotting of it
+  - some educational plotting
+  - examples and lots of docummentation via Doxygen
+  - introduce Kernel average misorientation
+
+
+\section files python code
+- \ref ebsd.EBSD read/use EBSD, to me merged with ebsd_CodeFromMA.py
+- \ref ebsd_Orientation.Orientation material symmetry + rotation of a material point
+- \ref ebsd_Symmetry.Symmetry material symmetry: cubic, hex, ...
+- \ref ebsd_Quaternion.Quaternion mathematical description of rotations
+- \ref ebsd_Rodrigues.Rodrigues rotation description (not used in any other file)
+
+
+\section examples tutorials
+- \ref ebsd.doxy EBSD usage
+- \ref ebsd_Orientation.doxy usage of Orientation, what it is...
+- \ref ebsd_Symmetry.doxy usage of Symmetry, ...
+
+\section todo TODO-list
+- What is the definition of the .crc fields, e.g. BC, BS,.. and the .org fields, e.g. CI, IQ, ...
+
+
+*/
